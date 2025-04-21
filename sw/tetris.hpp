@@ -2,104 +2,154 @@
 #define COLS 15 // play‑field width
 
 
-// Block shapes
-SHAPES = { I, O, T, S, Z, J, L }
+// Block Shapes
+#define SHAPE_I 100
+#define SHAPE_O 101
+#define SHAPE_T 102
+#define SHAPE_S 103
+#define SHAPE_Z 104
+#define SHAPE_J 105
+#define SHAPE_L 106
 
+/* Directions */
+#define LEFT 201
+#define RIGHT 202
+#define DOWN 203
+
+
+//Default Tetrimino Shapes
+
+int shape_I[4][4] = {
+    0,1,0,0,
+    0,1,0,0,
+    0,1,0,0,
+    0,1,0,0
+};
+
+int shape_T[4][4] = {
+    0,1,0,0,
+    0,1,1,0,
+    0,1,0,0,
+    0,0,0,0
+};
+
+int shape_L[4][4] = {
+    0,0,1,0,
+    1,1,1,0,
+    0,0,0,0,
+    0,0,0,0
+};
+
+int shape_J[4][4] = {
+    1,0,0,0,
+    1,1,1,0,
+    0,0,0,0,
+    0,0,0,0
+};
+
+int shape_S[4][4] = {
+    0,1,1,0,
+    1,1,0,0,
+    0,0,0,0,
+    0,0,0,0
+};
+
+int shape_Z[4][4] = {
+    1,1,0,0,
+    0,1,1,0,
+    0,0,0,0,
+    0,0,0,0
+};
+
+int shape_O[4][4] = {
+    1,1,0,0,
+    1,1,0,0,
+    0,0,0,0,
+    0,0,0,0
+};
 
 // Matrices
-BlockMatrix[4][4] // current falling tetromino
-Playfield[COLS][ROWS] // fixed blocks on the board
+block_matrix[4][4] // current falling tetromino
+playfield[COLS][ROWS] // fixed blocks on the board
 main() {
-   initMatrix() // clear the playfield
-   prepareFirstBlock() // choose initial shape & colour
+   init_matrix() // clear the playfield
+   prepare_first_block() // choose initial shape & colour
    loop until Quit OR GameOver
-       userInput() // non‑blocking; may set flags
-       stepTimer() // advances a tick
+       user_input() // non‑blocking; may set flags
+       step_timer() // advances a tick
    end loop
    if GameOver
-       showGameOver()
+       show_game_over()
    end if
 }
 
 
-initMatrix()
+init_matrix()
 // Set every cell of Playfield to BLANK (empty)
 
-
-prepareFirstBlock()
-// 1. Pick a random shape & colour for CurrentBlock
+prepare_first_block()
+// 1. Pick a random shape & color for CurrentBlock
 // 2. Initialise BlockMatrix accordingly
 // 3. Place CurrentBlock at top‑centre start position
 
-
-userInput()
+user_input()
 // Get most recent button presses polled during Vblank
 
-
-stepTimer()
+step_timer()
 // Called once per frame during vblank
 // Move or rotate the current block based on userInput() unless user input is Down
 // If accumulatedDelay < CurrentSpeed and userInput() is not Down
 // 1. accumulatedDelay++
 // Else
 // accumulatedDelay = 0
-// 1. moveBlock(DOWN)
+// 1. move_block(DOWN)
 // 2. If the move failed due to collision with bottom of playfield or fixed blocks:
-//      • fixCurrentBlockIntoPlayfield()
-//      • checkForLineClears()
-//      • spawnNextBlock() (may set GameOver)
+//      • fix_current_blockIntoPlayfield()
+//      • check_for_line_clears()
+//      • spawn_next_block() (may set GameOver)
 // 3. update score display
 
-
-moveBlock(direction)
+move_block(direction)
 // Attempt to translate CurrentBlock by one cell in the specified direction
-// Call detectCollision() first; if collision then return FAILURE
-// Otherwise update newBlockX / newBlockY and return SUCCESS
+// Call detect_collision() first; if collision then return FAILURE
+// Otherwise update BlockX / BlockY and return SUCCESS
 
-
-rotateBlock()
+rotate_block()
 // Compute the 90° rotated version of BlockMatrix
 // If the rotated piece collides with walls or fixed blocks then cancel
 // Else copy rotated data back into BlockMatrix
 
-
-detectCollision(candidateX, candidateY)
+detect_collision(candidateX, candidateY)
 // Given a hypothetical position of CurrentBlock:
 //   • Check left/right boundaries
 //   • Check bottom boundary
 //   • Check overlap with filled cells in Playfield
 // Return TRUE if any collision is detected, FALSE otherwise
 
-
-fixCurrentBlockIntoPlayfield()
+fixCurrent_block_into_playfield()
 // Copy all non‑blank cells from BlockMatrix into Playfield
 // at the current (BlockX, BlockY) offset
 
-
-checkForLineClears()
+check_for_line_clears()
 // Iterate every row of Playfield
 // If a row is completely filled:
-//     • removeLine(rowIndex)
-//     • increment LinesCleared and call calculateScore()
-//     • after every 20 cleared lines call increaseSpeed()
+//     • remove_line(rowIndex)
+//     • increment LinesCleared and call calculate_score()
+//     • after every 20 cleared lines call increase_speed()
 
-
-removeLine(rowIndex)
+remove_line(rowIndex)
 // Delete the specified row by shifting all rows above it downward by one
 // Insert a new blank row at the top of Playfield
 
-
-increaseSpeed()
+increase_speed()
 // Decrease the logical delay between automatic DOWN steps
 // Increment Level counter (both affect difficulty)
 
-
-spawnNextBlock()
+spawn_next_block()
 // 1. Select NextShape & colour (random)
 // 2. Reset BlockX, BlockY to the spawn coordinates
 // 3. Initialise BlockMatrix for the new shape
 // 4. If the new block immediately collides then set GameOver
 
-
-calculateScore()
+calculate_score()
 //Calculates score based on the number lines cleared at once and the current falling speed

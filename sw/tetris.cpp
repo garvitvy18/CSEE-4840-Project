@@ -5,11 +5,11 @@ playfield[COLS][ROWS] // fixed blocks on the board
 main() {
    init_matrix() // clear the playfield
    prepare_first_block() // choose initial shape & colour
-   loop until Quit OR GameOver
+   loop until quit OR game_over
        user_input() // non‑blocking; may set flags
        step_timer() // advances a tick
    end loop
-   if GameOver
+   if game_over
        show_game_over()
    end if
 }

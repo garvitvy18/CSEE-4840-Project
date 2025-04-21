@@ -1,7 +1,6 @@
 #define ROWS 20 // play‑field height
 #define COLS 15 // play‑field width
 
-
 // Block Shapes
 #define SHAPE_I 100
 #define SHAPE_O 101
@@ -16,9 +15,7 @@
 #define RIGHT 202
 #define DOWN 203
 
-
-//Default Tetrimino Shapes
-
+//Default Tetromino Shapes
 int shape_I[4][4] = {
     0,1,0,0,
     0,1,0,0,
@@ -83,7 +80,6 @@ main() {
    end if
 }
 
-
 init_matrix()
 // Set every cell of Playfield to BLANK (empty)
 
@@ -126,7 +122,7 @@ detect_collision(candidateX, candidateY)
 //   • Check overlap with filled cells in Playfield
 // Return TRUE if any collision is detected, FALSE otherwise
 
-fixCurrent_block_into_playfield()
+fix_current_block_into_playfield()
 // Copy all non‑blank cells from BlockMatrix into Playfield
 // at the current (BlockX, BlockY) offset
 

@@ -114,4 +114,6 @@ int  increase_speed() {
 }
 
 //display game over screen
-int  display_game_over(); 
+int  display_game_over() {
+
+}

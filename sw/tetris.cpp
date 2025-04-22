@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <tetris.hpp>
 
 int block_matrix[4][4] // current falling tetromino
@@ -52,16 +54,64 @@ void get_next_block() {
 }
 
 //rotate current tetromino
-void RotateBlock(bool dir); 
-void update_screen(); //update PPU VRAM and OAM
-void check_clear(); //check for line clears
-void clear_line(int Number); //perform line clear
-int get_random_color(); //get random color
-int get_random_shape(); //get random shape
-void update_score(); //update the score graphic
-void update_speed(); //update the speed graphic
-void update_level(); //update the level graphic
-void update_lines_cleared(); //update lines cleared
-void start_screen(); //display start screen
-int  increase_speed(); //increase falling speed
-int  display_game_over(); //display game over screen
+void RotateBlock(bool dir) {
+
+}
+
+//update PPU VRAM and OAM
+void update_screen() {
+
+}
+
+//check for line clears
+void check_clear() {
+
+}
+
+//perform line clear
+void clear_line(int num) {
+
+}
+
+//get random color
+int get_random_color() {
+
+}
+
+//get random shape
+int get_random_shape() {
+
+}
+
+//update the score graphic
+void update_score() {
+
+} 
+
+//update the speed graphic
+void update_speed() {
+
+} 
+
+//update the level graphic
+void update_level() {
+
+}
+
+//update lines cleared
+void update_lines_cleared() {
+
+}
+
+//display start screen
+void start_screen() {
+
+}
+
+//increase falling speed
+int  increase_speed() {
+
+}
+
+//display game over screen
+int  display_game_over(); 

@@ -65,72 +65,25 @@ int shape_O[4][4] = {
     0,0,0,0
 };
 
-init_matrix()
-// Set every cell of Playfield to BLANK (empty)
-
-prepare_first_block()
-// 1. Pick a random shape & color for CurrentBlock
-// 2. Initialise BlockMatrix accordingly
-// 3. Place CurrentBlock at top‑centre start position
-
-user_input()
-// Get most recent button presses polled during Vblank
-
-step_timer()
-// Called once per frame during vblank
-// Move or rotate the current block based on userInput() unless user input is Down
-// If accumulatedDelay < CurrentSpeed and userInput() is not Down
-// 1. accumulatedDelay++
-// Else
-// accumulatedDelay = 0
-// 1. move_block(DOWN)
-// 2. If the move failed due to collision with bottom of playfield or fixed blocks:
-//      • fix_current_blockIntoPlayfield()
-//      • check_for_line_clears()
-//      • spawn_next_block() (may set GameOver)
-// 3. update score display
-
-move_block(direction)
-// Attempt to translate CurrentBlock by one cell in the specified direction
-// Call detect_collision() first; if collision then return FAILURE
-// Otherwise update BlockX / BlockY and return SUCCESS
-
-rotate_block()
-// Compute the 90° rotated version of BlockMatrix
-// If the rotated piece collides with walls or fixed blocks then cancel
-// Else copy rotated data back into BlockMatrix
-
-detect_collision(candidateX, candidateY)
-// Given a hypothetical position of CurrentBlock:
-//   • Check left/right boundaries
-//   • Check bottom boundary
-//   • Check overlap with filled cells in Playfield
-// Return TRUE if any collision is detected, FALSE otherwise
-
-fix_current_block_into_playfield()
-// Copy all non‑blank cells from BlockMatrix into Playfield
-// at the current (BlockX, BlockY) offset
-
-check_for_line_clears()
-// Iterate every row of Playfield
-// If a row is completely filled:
-//     • remove_line(rowIndex)
-//     • increment LinesCleared and call calculate_score()
-//     • after every 20 cleared lines call increase_speed()
-
-remove_line(rowIndex)
-// Delete the specified row by shifting all rows above it downward by one
-// Insert a new blank row at the top of Playfield
-
-increase_speed()
-// Decrease the logical delay between automatic DOWN steps
-// Increment Level counter (both affect difficulty)
-
-spawn_next_block()
-// 1. Select NextShape & colour (random)
-// 2. Reset BlockX, BlockY to the spawn coordinates
-// 3. Initialise BlockMatrix for the new shape
-// 4. If the new block immediately collides then set GameOver
-
-calculate_score()
-//Calculates score based on the number lines cleared at once and the current falling speed
+void draw_tetromino(int x, int y, char color); //for drawing tetrominos
+void playfield_init(); //initialize the playfield
+void assign_shape_and_color(int shape, int color); //gives shape and color to the current falling tetromino
+int detect_collision(int dir); //returns 1 when tetromino collides with edge of screen or another tetromino
+int move_block(int dir); //moves the current tetromino in the specified direction, returns 0 if tetromino moved else returns 1
+void display_block(int x, int y, int shape, int color, int rotation); //display the tetromino on screen
+void display_next_shape(); //display the next tetromino box
+void update_background (); //update background
+void get_next_block(); //spawn next tetromino on screen
+void RotateBlock(bool dir); //rotate current tetromino
+void update_screen(); //update PPU VRAM and OAM
+void check_clear(); //check for line clears
+void clear_line(int Number); //perform line clear
+int get_random_color(); //get random color
+int get_random_shape(); //get random shape
+void update_score(); //update the score graphic
+void update_speed(); //update the speed graphic
+void update_level(); //update the level graphic
+void update_lines_cleared(); //update lines cleared
+void start_screen(); //display start screen
+int  increase_speed(); //increase falling speed
+int  display_game_over(); //display game over screen

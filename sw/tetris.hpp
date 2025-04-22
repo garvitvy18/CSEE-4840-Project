@@ -1,7 +1,7 @@
 #define ROWS 20 // play‑field height
 #define COLS 15 // play‑field width
 
-// Block Shapes
+/* Tetromino Shapes */
 #define SHAPE_I 100
 #define SHAPE_O 101
 #define SHAPE_T 102
@@ -11,9 +11,15 @@
 #define SHAPE_L 106
 
 /* Directions */
-#define LEFT 201
-#define RIGHT 202
-#define DOWN 203
+#define LEFT 200
+#define RIGHT 201
+#define DOWN 202
+
+/* Rotations */
+#define ZERO 300
+#define NINETY 301
+#define ONE_EIGHTY 302
+#define TWO_SEVENTY 303
 
 //Default Tetromino Shapes
 int shape_I[4][4] = {

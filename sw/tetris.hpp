@@ -22,6 +22,8 @@
 #define TWO_SEVENTY 303
 
 //Default Tetromino Shapes
+
+//0 rotation
 int shape_I[4][4] = {
     0,1,0,0,
     0,1,0,0,

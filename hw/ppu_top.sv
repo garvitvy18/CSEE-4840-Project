@@ -5,7 +5,6 @@ module ppu_top(
     input logic [31:0] write_data,
     input logic write,
     input chipselect,
-    input [31:0] address,
     output logic irq,
 
     output logic [7:0] VGA_R, VGA_G, VGA_B,

@@ -22,9 +22,6 @@ module PPU_asm(
     input logic [23:0] read_data_color_palettes
 );
 
-    logic [10:0] prev_hcount;
-    logic [9:0] prev_vcount;
-
     //Once per line
     logic [1279:0] background_line_buffer;
     logic [2:0] [31:0] sprite_graphics_buffer;
@@ -45,6 +42,8 @@ module PPU_asm(
     
 
     //Hsync memory access pointers
+    logic [5:0] background_line_pointer;
+    logic [2:0] sprite_graphics_pointer;
 
     always @(posedge clk) begin
         
@@ -60,6 +59,8 @@ module PPU_asm(
             coords_sprite_load <= 0;
             palette_sprite_load <= 0;
             palette_ram_pointer <= 0;
+            background_line_pointer <= 0;
+            sprite_graphics_pointer <= 0;
 
         end
 
@@ -133,7 +134,7 @@ module PPU_asm(
                 sprite_rotation_buffer[palette_sprite_load - 1] <= read_data_OAM[31:30];
                 palette_sprite_load <= palette_sprite_load + 1;
             end
-            
+
             else begin
                 rw_OAM <= 0;
                 addr_OAM <= 0;
@@ -142,7 +143,30 @@ module PPU_asm(
         end
 
         else if (hsync) begin
+
+            //Load background tiles into buffer
+            if (background_line_pointer == 0) begin
+                rw_tile_graphics 
+
+            end
+
+            else if (background_line_pointer < 40) begin
+                rw_tile_graphics
+            end
+
+            else if (background_line_pointer == 40) begin
+
+
+            end
             
+            //Detect which sprites are on the line
+
+
+            //Calculate pointers based on rotation flags and what line we are on
+
+                
+
+
 
         end
         else begin

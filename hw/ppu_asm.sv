@@ -60,9 +60,7 @@ module PPU_asm(
         //set buffers that fill once per frame
         else if (vblank) begin
             
-            //fill sprite_x_buffer
-
-            //fill sprite_y_buffer
+            //fill sprite_x_buffer and sprite_y_buffer
 
             //fill sprite_palette_buffer
 

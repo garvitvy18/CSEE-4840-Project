@@ -23,7 +23,8 @@ module PPU_asm(
 );
 
     //Once per line
-    logic [1279:0] background_line_buffer;
+    logic [1279:0] background_line_graphics_buffer;
+    logic [39:0] background_line_palette_buffer;
     logic [2:0] [31:0] sprite_graphics_buffer;
     logic [2:0] [6:0] sprites_on_line;
 
@@ -146,12 +147,47 @@ module PPU_asm(
 
             //Load background tiles into buffer
             if (background_line_pointer == 0) begin
-                rw_tile_graphics 
+                
+                rw_tile_buffer <= 0;
+
+                /*Calculate address into the tile buffer for tile at the start of the current line. 
+                We do *10 and not *40 since each 32-bit entry of the tile-buffer holds 4 tile IDs */
+                addr_tile_buffer <= vcount * 10; 
 
             end
 
+            else if (background_line_pointer == 1) begin
+
+                rw_tile_buffer <= 0;
+                rw_tile_graphics <= 0;
+
+                /*Calculate address into the tile buffer for current tile being processed.
+                We do >> 2 since each 32-bit entry of the tile-buffer holds 4 tile IDs */
+                addr_tile_buffer <= (vcount * 10) + (background_line_pointer >> 2); //
+
+        
+                /* Calculate the */
+                addr_tile_graphics <= read_data_tile_buffer[] * 16 
+                background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[7];
+                
+            end
+
             else if (background_line_pointer < 40) begin
-                rw_tile_graphics
+
+                rw_tile_buffer <= 0;
+                rw_tile_graphics <= 0;
+
+                /*Calculate address into the tile buffer for current tile being processed.
+                We do >> 2 since each 32-bit entry of the tile-buffer holds 4 tile IDs */
+                addr_tile_buffer <= (vcount * 10) + (background_line_pointer >> 2); //
+
+        
+                /* Calculate the */
+                addr_tile_graphics <= read_data_tile_buffer[] * 16 
+                background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[7];
+
+
+                
             end
 
             else if (background_line_pointer == 40) begin

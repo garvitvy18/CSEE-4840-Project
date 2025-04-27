@@ -146,6 +146,7 @@ module PPU_asm(
         else if (hsync) begin
 
             //Load background tiles into buffer
+            
             if (background_line_pointer == 0) begin
                 
                 rw_tile_buffer <= 0;
@@ -179,7 +180,7 @@ module PPU_asm(
 
                 /*Calculate address into the tile buffer for current tile being processed.
                 We do >> 2 since each 32-bit entry of the tile-buffer holds 4 tile IDs */
-                addr_tile_buffer <= (vcount * 10) + (background_line_pointer >> 2); //
+                addr_tile_buffer <= (vcount * 10) + (background_line_pointer >> 2); 
 
         
                 /* Calculate the */
@@ -194,13 +195,23 @@ module PPU_asm(
 
 
             end
+
+            else if (background_line_pointer == 41) begin
+
+            end
+
+            else begin
+
+
+            end
             
             //Detect which sprites are on the line
 
 
             //Calculate pointers based on rotation flags and what line we are on
 
-                
+            
+
 
 
 

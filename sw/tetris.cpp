@@ -5,6 +5,16 @@
 int block_matrix[4][4] // current falling tetromino
 int playfield[COLS][ROWS] // fixed blocks on the board
 main() {
+    int Return = 0;
+    char Key, ScanCode;
+    int Counter = 0;
+//Start the game and keep it running continuously
+    while (!Quit && !GameOver) {
+        if (++Counter >= Speed) {
+            Counter = 0;
+            MoveBlock(DOWN);
+            SoundDrop();
+        }
    
 }
 

@@ -17,6 +17,9 @@ module PPU_asm(
     output logic [10:0] addr_tile_graphics, addr_sprite_graphics,
     output logic [2:0] addr_color_palettes,
     output logic [7:0] addr_OAM,
+    output logic [8:0] [31:0] shift_load_data,
+    output logic [8:0] shift_enable,
+    output logic shift_load_sprite, shift_load_background,
 
     input logic [31:0] read_data_tile_buffer, read_data_tile_graphics, read_data_sprite_graphics, read_data_OAM,
     input logic [23:0] read_data_color_palettes
@@ -25,16 +28,16 @@ module PPU_asm(
     //Once per line
     logic [1279:0] background_line_graphics_buffer;
     logic [39:0] background_line_palette_buffer;
-    logic [2:0] [31:0] sprite_graphics_buffer;
-    logic [2:0] [6:0] sprites_on_line;
+    logic [7:0] [31:0] sprite_graphics_buffer;
+    logic [7:0] [6:0] sprites_on_line;
 
     //Once per frame
-    logic [2:0] [23:0] color_palette_buffer;
-    logic [6:0] [15:0] sprite_x_buffer;
-    logic [6:0] [15:0] sprite_y_buffer;
-    logic [6:0] sprite_palette_buffer;
-    logic [6:0] [6:0] sprite_tile_id_buffer;
-    logic [6:0] [1:0] sprite_rotation_buffer;
+    logic [8:0] [23:0] color_palette_buffer;
+    logic [127:0] [15:0] sprite_x_buffer;
+    logic [127:0] [15:0] sprite_y_buffer;
+    logic [127:0] sprite_palette_buffer;
+    logic [127:0] [6:0] sprite_tile_id_buffer;
+    logic [127:0] [1:0] sprite_rotation_buffer;
 
     //Vblank memory access pointers
     logic [7:0] cords_sprite_load;
@@ -45,7 +48,9 @@ module PPU_asm(
     //Hsync memory access pointers
     logic [5:0] background_line_pointer;
     logic [2:0] sprite_graphics_pointer;
-    logic sprites_on_line_pointer;
+    logic [7:0] sprites_on_line_pointer;
+    logic [3:0] shift_register_load_pointer;
+    logic [3:0] sprites_found;
 
     always @(posedge clk) begin
         
@@ -62,6 +67,25 @@ module PPU_asm(
             background_line_pointer <= 0;
             sprite_graphics_pointer <= 0;
             sprites_on_line_pointer <= 0;
+            sprites_found <= 0;
+            shift_register_load_pointer <= 0;
+            shift_enable <= 0;
+            shift_load_background <= 0;
+            shift_load_sprite <= 0;
+            sprite_palette_buffer <= 0;
+            background_line_graphics_buffer <= 1280'b0;
+            background_line_palette_buffer <= 40'b0;
+            for (int i = 0; i < 128; i = i + 1) begin
+                sprite_x_buffer[i] <= 0;
+                sprite_y_buffer[i] <= 0;
+                sprite_tile_id_buffer[i] <= 0;
+                sprite_rotation_buffer[i] <= 0;
+            end
+            for (int i = 0; i < 8; i += 1) begin
+                 sprite_graphics_buffer[i] <= 0;
+                 sprites_on_line[i] <= 0;
+                 shift_load_data[i] <= 0;
+            end
 
         end
 
@@ -310,15 +334,70 @@ module PPU_asm(
                 addr_tile_graphics <= 0;
             end
             
-            //Detect which sprites are on the line
-            
+            //Detect which sprites are on the line 
+            if (sprites_on_line_pointer < 128) begin
+
+                //If current sprite is on the line and we have not filled all the sprite slots
+                if (sprites_found <= 8 && (vcount >= sprite_y_buffer[sprites_on_line_pointer]) && (vcount < sprite_y_buffer[sprites_on_line_pointer] + 16)) begin
+                    sprites_on_line[sprites_found] <= sprites_on_line_pointer;
+                    sprites_found <= sprites_found + 1;
+                end
+                sprites_on_line_pointer <= sprites_on_line_pointer + 1;
+            end
 
             //Calculate pointers to sprite graphics based on rotation flags, what line we are on, and the sprites' Y positions
-        
+            else if (shift_register_load_pointer == 0) begin
+                rw_sprite_graphics <= 0;
+                
+                if (sprite_rotation_buffer[sprites_on_line[shift_register_load_pointer]][1]) addr_sprite_graphics <= ((sprite_tile_id_buffer[sprites_on_line[shift_register_load_pointer]]) * 16) + (15 - (vcount - sprite_y_buffer[sprites_on_line[shift_register_load_pointer]]));
+                else addr_sprite_graphics <= ((sprite_tile_id_buffer[sprites_on_line[shift_register_load_pointer]]) * 16) + (vcount - sprite_y_buffer[sprites_on_line[shift_register_load_pointer]]);
+                
+                shift_register_load_pointer <= shift_register_load_pointer + 1;
 
+            end
 
+            else if (shift_register_load_pointer < 8) begin
 
+                rw_sprite_graphics <= 0;
+                
+                if (sprite_rotation_buffer[sprites_on_line[shift_register_load_pointer]][1]) addr_sprite_graphics <= ((sprite_tile_id_buffer[sprites_on_line[shift_register_load_pointer]]) * 16) + (15 - (vcount - sprite_y_buffer[sprites_on_line[shift_register_load_pointer]]));
+                else addr_sprite_graphics <= ((sprite_tile_id_buffer[sprites_on_line[shift_register_load_pointer]]) * 16) + (vcount - sprite_y_buffer[sprites_on_line[shift_register_load_pointer]]);
 
+                if (sprite_rotation_buffer[sprites_on_line[shift_register_load_pointer]][0]) sprite_graphics_buffer[shift_register_load_pointer - 1][31:0] <= read_data_sprite_graphics[0:31];
+                else sprite_graphics_buffer[shift_register_load_pointer - 1] <= read_data_sprite_graphics;
+
+                shift_register_load_pointer <= shift_register_load_pointer + 1;
+
+            end
+
+            else if (shift_register_load_pointer == 8) begin
+
+                rw_sprite_graphics <= 0;
+                addr_sprite_graphics <= 0;
+
+                if (sprite_rotation_buffer[sprites_on_line[shift_register_load_pointer]][0]) sprite_graphics_buffer[shift_register_load_pointer - 1][31:0] <= read_data_sprite_graphics[0:31];
+                else sprite_graphics_buffer[shift_register_load_pointer - 1] <= read_data_sprite_graphics;
+
+                shift_register_load_pointer <= shift_register_load_pointer + 1;
+
+            end
+
+            else if (shift_register_load_pointer == 9) begin
+                rw_sprite_graphics <= 0;
+                addr_sprite_graphics <= 0;
+
+                shift_load_sprite <= 1;
+                shift_load_data[7:0] <= sprite_graphics_buffer;
+
+            end
+                
+
+            else begin 
+                shift_load_sprite <= 0;
+                shift_load_data[7:0] <= 0;
+                rw_sprite_graphics <= 0;
+                addr_sprite_graphics <= 0;
+            end
         end
         else begin
             //Reset vblank and hsync memory pointers
@@ -328,6 +407,8 @@ module PPU_asm(
             background_line_pointer <= 0;
             sprite_graphics_pointer <= 0;
             sprites_on_line_pointer <= 0;
+            sprites_found <= 0;
+            shift_register_load_pointer <= 0;
 
 
 

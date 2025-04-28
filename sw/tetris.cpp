@@ -13,7 +13,7 @@ main() {
         if (++Counter >= Speed) {
             Counter = 0;
             move_block(DOWN);
-            SoundDrop();
+            //SoundDrop();
         }
    
     }
@@ -305,6 +305,36 @@ void update_background() {
 //spawn next tetromino on screen
 void get_next_block() {
 
+    // Lock the current piece into the playfield
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (block_matrix[i][j] != 0) {
+                playfield[current_x + i][current_y + j] = block_matrix[i][j];
+            }
+        }
+    }
+     // Clear any completed lines
+    check_clear();
+
+     // Advance the next piece into the current slot
+    current_shape = next_shape;
+    current_color = next_color;
+
+    // Generate a brand-new preview piece
+    next_shape = get_random_shape();
+    next_color = get_random_color();
+
+    // Reset position for the new current piece
+    current_x = start_x;
+    current_y = 0;
+
+    // Update the preview display
+    display_next_shape();
+
+    // If the new piece immediately collides, it's game over
+    if (detect_collision(DOWN)) {
+        game_over = 1;
+    }
 }
 
 //rotate current tetromino

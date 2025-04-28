@@ -12,7 +12,7 @@ main() {
     while (!Quit && !GameOver) {
         if (++Counter >= Speed) {
             Counter = 0;
-            MoveBlock(DOWN);
+            move_block(DOWN);
             SoundDrop();
         }
    

@@ -280,6 +280,25 @@ void display_next_shape() {
 
 //update background
 void update_background() {
+ // Mark every cell dirty so that draw_tetromino always redraws it
+    for (int x = 0; x < COLS; ++x) {
+        for (int y = 0; y < ROWS; ++y) {
+            PreviousScreenLayout[x][y] = BLANK - 1;
+        }
+    }
+
+    // Redraw the entire playfield
+    for (int x = 0; x < COLS; ++x) {
+        for (int y = 0; y < ROWS; ++y) {
+            if (playfield[x][y] != 0) {
+                // occupied → draw that block color
+                draw_tetromino(x, y, playfield[x][y]);
+            } else {
+                // empty → clear it
+                draw_tetromino(x, y, BLANK);
+            }
+        }
+    }
 
 }
 

@@ -171,8 +171,33 @@ module PPU_asm(
         
                 /* Calculate the address into the tile graphics memory for the current line
                 of the current tile being processed */
-                addr_tile_graphics <= (read_data_tile_buffer[6:0] * 16) + (background_line_pointer - 1);
-                background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[7];
+                case (background_line_pointer[1:0]) 
+                    
+                    1: begin
+                        addr_tile_graphics <= (read_data_tile_buffer[6:0] * 16) + (background_line_pointer - 1);
+                        background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[7];
+                    end
+
+                    2: begin
+                        addr_tile_graphics <= (read_data_tile_buffer[14:8] * 16) + (background_line_pointer - 1);
+                        background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[15];
+
+                    end
+
+                    3: begin
+                        addr_tile_graphics <= (read_data_tile_buffer[22:16] * 16) + (background_line_pointer - 1);
+                        background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[23];
+
+                    end
+
+                    0: begin
+                        addr_tile_graphics <= (read_data_tile_buffer[30:24] * 16) + (background_line_pointer - 1);
+                        background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[31];
+                    end
+                    
+                endcase
+
+                
 
                 background_line_pointer <= background_line_pointer + 1;
         
@@ -190,8 +215,31 @@ module PPU_asm(
         
                 /* Calculate the address into the tile graphics memory for the current line
                 of the current tile being processed */
-                addr_tile_graphics <= (read_data_tile_buffer[6:0] * 16) + (background_line_pointer - 1);
-                background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[7];
+                case (background_line_pointer[1:0]) 
+                    
+                    1: begin
+                        addr_tile_graphics <= (read_data_tile_buffer[6:0] * 16) + (background_line_pointer - 1);
+                        background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[7];
+                    end
+
+                    2: begin
+                        addr_tile_graphics <= (read_data_tile_buffer[14:8] * 16) + (background_line_pointer - 1);
+                        background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[15];
+
+                    end
+
+                    3: begin
+                        addr_tile_graphics <= (read_data_tile_buffer[22:16] * 16) + (background_line_pointer - 1);
+                        background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[23];
+
+                    end
+
+                    0: begin
+                        addr_tile_graphics <= (read_data_tile_buffer[30:24] * 16) + (background_line_pointer - 1);
+                        background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[31];
+                    end
+                    
+                endcase
 
                 background_line_graphics_buffer[(background_line_pointer - 1) * 31 -: 32] <= read_data_tile_graphics;
 
@@ -208,8 +256,31 @@ module PPU_asm(
 
                 /* Calculate the address into the tile graphics memory for the current line
                 of the current tile being processed */
-                addr_tile_graphics <= (read_data_tile_buffer[6:0] * 16) + (background_line_pointer - 1);
-                background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[7];
+                case (background_line_pointer[1:0]) 
+                    
+                    1: begin
+                        addr_tile_graphics <= (read_data_tile_buffer[6:0] * 16) + (background_line_pointer - 1);
+                        background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[7];
+                    end
+
+                    2: begin
+                        addr_tile_graphics <= (read_data_tile_buffer[14:8] * 16) + (background_line_pointer - 1);
+                        background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[15];
+
+                    end
+
+                    3: begin
+                        addr_tile_graphics <= (read_data_tile_buffer[22:16] * 16) + (background_line_pointer - 1);
+                        background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[23];
+
+                    end
+
+                    0: begin
+                        addr_tile_graphics <= (read_data_tile_buffer[30:24] * 16) + (background_line_pointer - 1);
+                        background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[31];
+                    end
+                    
+                endcase
 
                 background_line_graphics_buffer[(background_line_pointer - 1) * 31 -: 32] <= read_data_tile_graphics;
 

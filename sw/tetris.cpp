@@ -192,7 +192,7 @@ void display_block(int x, int y, int shape, int color, int rotation) {
     }
 
     //Display the blocks
-      // 4) Draw each occupied cell
+      //Draw each occupied cell
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
             if (block_matrix[i][j] != 0) {
@@ -205,6 +205,76 @@ void display_block(int x, int y, int shape, int color, int rotation) {
 
 //display the next tetromino box
 void display_next_shape() {
+        // Build a temporary 4×4 color matrix for the next piece
+    int temp[4][4] = { 0 };
+
+    switch (next_shape) {
+        case SHAPE_I:
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    temp[i][j] = shape_I[i][j] ? next_color : 0;
+                }
+            }
+            break;
+        case SHAPE_O:
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    temp[i][j] = shape_O[i][j] ? next_color : 0;
+                }
+            }
+            break;
+          case SHAPE_T:
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    temp[i][j] = shape_T[i][j] ? next_color : 0;
+                }
+            }
+            break;
+        case SHAPE_S:
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    temp[i][j] = shape_S[i][j] ? next_color : 0;
+                }
+            }
+            break;
+        case SHAPE_Z:
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    temp[i][j] = shape_Z[i][j] ? next_color : 0;
+                }
+            }
+            break;
+         case SHAPE_J:
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    temp[i][j] = shape_J[i][j] ? next_color : 0;
+                }
+            }
+            break;
+        case SHAPE_L:
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    temp[i][j] = shape_L[i][j] ? next_color : 0;
+                }
+            }
+            break;
+        default:
+            // If unknown shape, leave temp all zero
+            break;
+    }
+     // Draw the preview at a fixed offset (in grid cells)
+    const int PREVIEW_X = COLS + 2;
+    const int PREVIEW_Y = 0;
+
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (temp[i][j] != 0) {
+                draw_tetromino(PREVIEW_X + j,
+                               PREVIEW_Y + i,
+                               temp[i][j]);
+            }
+        }
+    }
 
 }
 

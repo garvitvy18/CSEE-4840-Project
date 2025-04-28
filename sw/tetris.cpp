@@ -441,6 +441,15 @@ int get_random_color() {
 
 //get random shape
 int get_random_shape() {
+switch(rand() % 7) {
+  case 0: return SHAPE_I;
+  case 1: return SHAPE_J;
+  case 2: return SHAPE_L;
+  case 3: return SHAPE_O;
+  case 4: return SHAPE_S;
+  case 5: return SHAPE_Z;
+  case 6: return SHAPE_T;
+}
 
 }
 

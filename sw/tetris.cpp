@@ -427,6 +427,15 @@ void clear_line(int num) {
 
 //get random color
 int get_random_color() {
+    switch (rand() % 5) {
+        case 0: return BLUE;
+        case 1: return RED;
+        case 2: return GREEN;
+        case 3: return YELLOW;
+        case 4: return PURPLE;
+        default: 
+            return BLUE;  // should never happen, but satisfies all paths
+    }
 
 }
 

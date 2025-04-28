@@ -385,6 +385,28 @@ void update_screen() {
 
 //check for line clears
 void check_clear() {
+     // Scan each row for completeness
+    for (int y = 0; y < ROWS; ++y) {
+        bool full = true;
+        // Check if every column in this row is occupied
+        for (int x = 0; x < COLS; ++x) {
+            if (playfield[x][y] == 0) {
+                full = false;
+                break;
+            }
+        }
+        // If the row is full, remove it and update HUD
+        if (full) {
+            clear_line(y);           // remove the line and shift above rows down
+            update_score();          // refresh the score display
+            update_lines_cleared();  // refresh the lines‐cleared display
+            // speed up every so often
+            if (increase_speed() == 0) {
+                update_speed();      // refresh the speed display
+                update_level();      // refresh the level display
+            }
+        }
+    }
 
 }
 

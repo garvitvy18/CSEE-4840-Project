@@ -215,16 +215,15 @@ module PPU_asm(
             //Detect which sprites are on the line
 
 
-            //Calculate pointers based on rotation flags and what line we are on
-
-            
+            //Calculate pointers to sprite graphics based on rotation flags, what line we are on, and the sprites' Y positions
+        
 
 
 
 
         end
         else begin
-            //Reset vblank memory pointers
+            //Reset vblank and hsync memory pointers
             coords_sprite_load <= 0;
             palette_sprite_load <= 0;
             palette_ram_pointer <= 0;

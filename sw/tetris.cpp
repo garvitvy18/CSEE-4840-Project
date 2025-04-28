@@ -16,8 +16,8 @@ main() {
             SoundDrop();
         }
    
+    }
 }
-
 //for drawing tetrominos
 void draw_tetromino(int x, int y, char color) {
    //Convert cell coordinates to pixel coordinates

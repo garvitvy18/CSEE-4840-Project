@@ -146,7 +146,7 @@ module PPU_asm(
         else if (hsync) begin
 
             //Load background tiles into buffer
-            
+
             if (background_line_pointer == 0) begin
                 
                 rw_tile_buffer <= 0;
@@ -164,10 +164,11 @@ module PPU_asm(
 
                 /*Calculate address into the tile buffer for current tile being processed.
                 We do >> 2 since each 32-bit entry of the tile-buffer holds 4 tile IDs */
-                addr_tile_buffer <= (vcount * 10) + (background_line_pointer >> 2); //
+                addr_tile_buffer <= (vcount * 10) + (background_line_pointer >> 2);
 
         
-                /* Calculate the */
+                /* Calculate the address into the tile graphics memory for the current line
+                of the current tile being processed */
                 addr_tile_graphics <= read_data_tile_buffer[] * 16 
                 background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[7];
                 
@@ -183,7 +184,8 @@ module PPU_asm(
                 addr_tile_buffer <= (vcount * 10) + (background_line_pointer >> 2); 
 
         
-                /* Calculate the */
+                /* Calculate the address into the tile graphics memory for the current line
+                of the current tile being processed */
                 addr_tile_graphics <= read_data_tile_buffer[] * 16 
                 background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[7];
 

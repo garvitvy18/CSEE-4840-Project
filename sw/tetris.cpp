@@ -412,6 +412,16 @@ void check_clear() {
 
 //perform line clear
 void clear_line(int num) {
+     // Shift all rows above 'num' down by one
+    for (int y = num; y > 0; --y) {
+        for (int x = 0; x < COLS; ++x) {
+            playfield[x][y] = playfield[x][y - 1];
+        }
+    }
+    // Clear the top row
+    for (int x = 0; x < COLS; ++x) {
+        playfield[x][0] = 0;
+    }
 
 }
 

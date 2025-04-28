@@ -29,6 +29,12 @@ void draw_tetromino(int x, int y, char color) {
 
 //initialize the playfield
 void playfield_init() {
+    //Initialize the playfield based on the total columns and rows
+    for(int i=0;i<COLS;i++){
+        for(int j=0;j<ROWS;j++){
+            playfield[i][j]=0;
+        }
+    }
     
 }
 

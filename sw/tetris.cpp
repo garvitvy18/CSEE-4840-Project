@@ -40,6 +40,67 @@ void playfield_init() {
 
 //gives shape and color to the current falling tetromino
 void assign_shape_and_color(int shape, int color) {
+     switch(shape){
+        case SHAPE_I:
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    block_matrix[j][i] = shape_I[i][j] ? color : 0;
+                }
+            }
+            break;
+        case SHAPE_O:
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    block_matrix[j][i] = shape_O[i][j] ? color : 0;
+                }
+            }
+            break;
+         case SHAPE_T:
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    block_matrix[j][i] = shape_T[i][j] ? color : 0;
+                }
+            }
+            break;
+        case SHAPE_S:
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    block_matrix[j][i] = shape_S[i][j] ? color : 0;
+                }
+            }
+            break;
+         case SHAPE_Z:
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    block_matrix[j][i] = shape_Z[i][j] ? color : 0;
+                }
+            }
+            break;
+        case SHAPE_J:
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    block_matrix[j][i] = shape_J[i][j] ? color : 0;
+                }
+            }
+            break;
+        case SHAPE_L:
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    block_matrix[j][i] = shape_L[i][j] ? color : 0;
+                }
+            }
+            break;
+        default:
+            // Unknown shape: clear out
+            for (int i = 0; i < 4; ++i)
+                for (int j = 0; j < 4; ++j)
+                    block_matrix[j][i] = 0;
+            break;
+        
+    }
+    current_shape=shape;
+    current_color=color;
+
 
 }
 

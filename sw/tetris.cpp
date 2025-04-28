@@ -339,6 +339,33 @@ void get_next_block() {
 
 //rotate current tetromino
 void RotateBlock(bool dir) {
+    // Backup the current 4×4 block matrix
+    int temp[4][4];
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            temp[i][j] = block_matrix[i][j];
+        }
+    }
+
+    // Apply rotation: CW if dir==true, else CCW via three CWs
+    if (dir) {
+        RotateBlock();           // calls the no‐arg, DOS‐style RotateBlock (90° CW)
+    } else {
+        RotateBlock();
+        RotateBlock();
+        RotateBlock();           // net effect: 90° CCW
+    }
+ // If the rotated piece now collides, restore the old matrix
+    if (detect_collision(REFRESH)) {
+        for (int i = 0; i < 4; ++i) {
+            for (int j = 0; j < 4; ++j) {
+                block_matrix[i][j] = temp[i][j];
+            }
+        }
+    } else {
+        // Otherwise, redraw the piece at its current position
+        display_block(current_x, current_y, current_shape, current_color, ZERO);
+    }
 
 }
 

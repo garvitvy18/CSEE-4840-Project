@@ -170,6 +170,36 @@ int move_block(int dir) {
 
 //display the tetromino on screen
 void display_block(int x, int y, int shape, int color, int rotation) {
+    current_x=x;
+    current_y=y;
+    current_shape=shape;
+    current_color=color;
+
+    assign_shape_and_color(shape,color);
+
+      // Apply rotation
+    int times = 0;
+    switch (rotation) {
+        case NINETY:     times = 1; break;
+        case ONE_EIGHTY: times = 2; break;
+        case TWO_SEVENTY:times = 3; break;
+        case ZERO:
+        default:         times = 0; break;
+    }
+    for (int r = 0; r < times; ++r) {
+        // rotate 90° CW
+        RotateBlock(true);
+    }
+
+    //Display the blocks
+      // 4) Draw each occupied cell
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (block_matrix[i][j] != 0) {
+                draw_tetromino(x + i, y + j, block_matrix[i][j]);
+            }
+        }
+    }
 
 }
 

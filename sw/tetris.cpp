@@ -10,6 +10,10 @@ main() {
 
 //for drawing tetrominos
 void draw_tetromino(int x, int y, char color) {
+   //Convert cell coordinates to pixel coordinates
+    int pixel_x = LEFT + x * 21;
+    int pixel_y = TOP  + y * 21;
+   
 
 }
 

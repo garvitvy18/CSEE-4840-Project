@@ -45,6 +45,7 @@ module PPU_asm(
     //Hsync memory access pointers
     logic [5:0] background_line_pointer;
     logic [2:0] sprite_graphics_pointer;
+    logic sprites_on_line_pointer;
 
     always @(posedge clk) begin
         
@@ -60,6 +61,7 @@ module PPU_asm(
             palette_ram_pointer <= 0;
             background_line_pointer <= 0;
             sprite_graphics_pointer <= 0;
+            sprites_on_line_pointer <= 0;
 
         end
 
@@ -169,7 +171,7 @@ module PPU_asm(
         
                 /* Calculate the address into the tile graphics memory for the current line
                 of the current tile being processed */
-                addr_tile_graphics <= read_data_tile_buffer[] * 16 
+                addr_tile_graphics <= (read_data_tile_buffer[6:0] * 16) + (background_line_pointer - 1);
                 background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[7];
 
                 background_line_pointer <= background_line_pointer + 1;
@@ -188,8 +190,10 @@ module PPU_asm(
         
                 /* Calculate the address into the tile graphics memory for the current line
                 of the current tile being processed */
-                addr_tile_graphics <= read_data_tile_buffer[] * 16 
+                addr_tile_graphics <= (read_data_tile_buffer[6:0] * 16) + (background_line_pointer - 1);
                 background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[7];
+
+                background_line_graphics_buffer[(background_line_pointer - 1) * 31 -: 32] <= read_data_tile_graphics;
 
                 background_line_pointer <= background_line_pointer + 1;
 
@@ -197,23 +201,46 @@ module PPU_asm(
 
             else if (background_line_pointer == 40) begin
 
+                rw_tile_buffer <= 0;
+                rw_tile_graphics <= 0;
+
+                addr_tile_buffer <= 0;
+
+                /* Calculate the address into the tile graphics memory for the current line
+                of the current tile being processed */
+                addr_tile_graphics <= (read_data_tile_buffer[6:0] * 16) + (background_line_pointer - 1);
+                background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[7];
+
+                background_line_graphics_buffer[(background_line_pointer - 1) * 31 -: 32] <= read_data_tile_graphics;
+
                 background_line_pointer <= background_line_pointer + 1;
 
             end
 
             else if (background_line_pointer == 41) begin
 
+                rw_tile_buffer <= 0;
+                rw_tile_graphics <= 0;
+
+                addr_tile_buffer <= 0;
+                addr_tile_graphics <= 0;
+
+                background_line_graphics_buffer[(background_line_pointer - 1) * 31 -: 32] <= read_data_tile_graphics;
+
                 background_line_pointer <= background_line_pointer + 1;
 
             end
 
             else begin
+                rw_tile_buffer <= 0;
+                rw_tile_graphics <= 0;
 
-
+                addr_tile_buffer <= 0;
+                addr_tile_graphics <= 0;
             end
             
             //Detect which sprites are on the line
-
+            
 
             //Calculate pointers to sprite graphics based on rotation flags, what line we are on, and the sprites' Y positions
         
@@ -229,6 +256,7 @@ module PPU_asm(
             palette_ram_pointer <= 0;
             background_line_pointer <= 0;
             sprite_graphics_pointer <= 0;
+            sprites_on_line_pointer <= 0;
 
 
 

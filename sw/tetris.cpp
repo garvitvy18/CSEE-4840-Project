@@ -371,6 +371,15 @@ void RotateBlock(bool dir) {
 
 //update PPU VRAM and OAM
 void update_screen() {
+        // Redraw the static, locked blocks
+    update_background();
+
+    // Draw the currently falling piece on top (no additional rotation)
+    display_block(current_x,
+                  current_y,
+                  current_shape,
+                  current_color,
+                  ZERO);
 
 }
 

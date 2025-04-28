@@ -55,8 +55,6 @@ module PPU_asm(
             rw_sprite_graphics <= 0;
             rw_color_palettes <= 0;
             rw_OAM <= 0;
-            prev_hcount <= 0;
-            prev_vcount <= 0;
             coords_sprite_load <= 0;
             palette_sprite_load <= 0;
             palette_ram_pointer <= 0;
@@ -155,6 +153,8 @@ module PPU_asm(
                 We do *10 and not *40 since each 32-bit entry of the tile-buffer holds 4 tile IDs */
                 addr_tile_buffer <= vcount * 10; 
 
+                background_line_pointer <= background_line_pointer + 1;
+
             end
 
             else if (background_line_pointer == 1) begin
@@ -171,7 +171,9 @@ module PPU_asm(
                 of the current tile being processed */
                 addr_tile_graphics <= read_data_tile_buffer[] * 16 
                 background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[7];
-                
+
+                background_line_pointer <= background_line_pointer + 1;
+        
             end
 
             else if (background_line_pointer < 40) begin
@@ -189,16 +191,19 @@ module PPU_asm(
                 addr_tile_graphics <= read_data_tile_buffer[] * 16 
                 background_line_palette_buffer[background_line_pointer - 1] <= read_data_tile_buffer[7];
 
+                background_line_pointer <= background_line_pointer + 1;
 
-                
             end
 
             else if (background_line_pointer == 40) begin
 
+                background_line_pointer <= background_line_pointer + 1;
 
             end
 
             else if (background_line_pointer == 41) begin
+
+                background_line_pointer <= background_line_pointer + 1;
 
             end
 
@@ -223,6 +228,8 @@ module PPU_asm(
             coords_sprite_load <= 0;
             palette_sprite_load <= 0;
             palette_ram_pointer <= 0;
+            background_line_pointer <= 0;
+            sprite_graphics_pointer <= 0;
 
 
 

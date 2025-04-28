@@ -145,6 +145,26 @@ int detect_collision(int dir) {
 
 //moves the current tetromino in the specified direction, returns 0 if tetromino moved else returns 1
 int move_block(int dir) {
+    // First check for collision by calling the function 
+    if (detect_collision(dir)) {
+        // If we hit something when moving down, lock the piece and spawn next
+        if (dir == DOWN) {
+            get_next_block();
+        }
+        return 1;  // collision occurred
+        } else {
+        // No collision: update the current position
+        if (dir == LEFT) {
+            current_x--;
+        } 
+        else if (dir == RIGHT) {
+            current_x++;
+        } 
+        else if (dir == DOWN) {
+            current_y++;
+        }
+        return 0;  // moved successfully
+    }
 
 }
 

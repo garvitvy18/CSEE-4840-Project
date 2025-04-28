@@ -106,6 +106,40 @@ void assign_shape_and_color(int shape, int color) {
 
 //returns 1 when tetromino collides with edge of screen or another tetromino
 int detect_collision(int dir) {
+    //For computing the new position based on the current position
+    int new_x=current_x;
+    int new_y=current_y;
+
+    // Adjust for the attempted move
+    if (dir == LEFT)       new_x--;
+    else if (dir == RIGHT) new_x++;
+    else if (dir == DOWN)  new_y++;
+ // For each cell in the 4×4 block matrix
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            // Skip empty cells
+            if (block_matrix[i][j] == 0) 
+                continue;
+
+            // Compute the board coordinates of this cell
+            int bx = new_x + i;
+            int by = new_y + j;
+
+            // Collision if out of horizontal bounds
+            if (bx < 0 || bx >= COLS)
+                return 1;
+             // Collision if below the bottom
+            if (by >= ROWS)
+                return 1;
+
+            // Collision if landing on an occupied cell
+            if (playfield[bx][by] != 0)
+                return 1;
+        }
+    }
+
+    // No collision detected
+    return 0;
 
 }
 

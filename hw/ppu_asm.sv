@@ -338,7 +338,7 @@ module PPU_asm(
             if (sprites_on_line_pointer < 128) begin
 
                 //If current sprite is on the line and we have not filled all the sprite slots
-                if (sprites_found <= 8 && (vcount >= sprite_y_buffer[sprites_on_line_pointer]) && (vcount < sprite_y_buffer[sprites_on_line_pointer] + 16)) begin
+                if (sprites_found < 8 && (vcount >= sprite_y_buffer[sprites_on_line_pointer]) && (vcount < sprite_y_buffer[sprites_on_line_pointer] + 16)) begin
                     sprites_on_line[sprites_found] <= sprites_on_line_pointer;
                     sprites_found <= sprites_found + 1;
                 end
@@ -362,10 +362,12 @@ module PPU_asm(
                 
                 if (sprite_rotation_buffer[sprites_on_line[shift_register_load_pointer]][1]) addr_sprite_graphics <= ((sprite_tile_id_buffer[sprites_on_line[shift_register_load_pointer]]) * 16) + (15 - (vcount - sprite_y_buffer[sprites_on_line[shift_register_load_pointer]]));
                 else addr_sprite_graphics <= ((sprite_tile_id_buffer[sprites_on_line[shift_register_load_pointer]]) * 16) + (vcount - sprite_y_buffer[sprites_on_line[shift_register_load_pointer]]);
-
-                if (sprite_rotation_buffer[sprites_on_line[shift_register_load_pointer]][0]) sprite_graphics_buffer[shift_register_load_pointer - 1][31:0] <= read_data_sprite_graphics[0:31];
-                else sprite_graphics_buffer[shift_register_load_pointer - 1] <= read_data_sprite_graphics;
-
+                
+                //Check against sprites_found to make sure we don't load garbage data into the graphics buffers
+                if (sprites_on_line_pointer <= sprites_found) begin
+                    if (sprite_rotation_buffer[sprites_on_line[shift_register_load_pointer]][0]) sprite_graphics_buffer[shift_register_load_pointer - 1][31:0] <= read_data_sprite_graphics[0:31];
+                    else sprite_graphics_buffer[shift_register_load_pointer - 1] <= read_data_sprite_graphics;
+                end else sprite_graphics_buffer[shift_register_load_pointer - 1] <= 0;
                 shift_register_load_pointer <= shift_register_load_pointer + 1;
 
             end
@@ -375,8 +377,11 @@ module PPU_asm(
                 rw_sprite_graphics <= 0;
                 addr_sprite_graphics <= 0;
 
-                if (sprite_rotation_buffer[sprites_on_line[shift_register_load_pointer]][0]) sprite_graphics_buffer[shift_register_load_pointer - 1][31:0] <= read_data_sprite_graphics[0:31];
-                else sprite_graphics_buffer[shift_register_load_pointer - 1] <= read_data_sprite_graphics;
+                //Check against sprites_found to make sure we don't load garbage data into the graphic buffers
+                if (sprites_on_line_pointer <= sprites_found) begin
+                    if (sprite_rotation_buffer[sprites_on_line[shift_register_load_pointer]][0]) sprite_graphics_buffer[shift_register_load_pointer - 1][31:0] <= read_data_sprite_graphics[0:31];
+                    else sprite_graphics_buffer[shift_register_load_pointer - 1] <= read_data_sprite_graphics;
+                end else sprite_graphics_buffer[shift_register_load_pointer - 1] <= 0;
 
                 shift_register_load_pointer <= shift_register_load_pointer + 1;
 
@@ -392,7 +397,6 @@ module PPU_asm(
 
             end
                 
-
             else begin 
                 shift_load_sprite <= 0;
                 rw_sprite_graphics <= 0;
@@ -409,6 +413,7 @@ module PPU_asm(
             sprites_on_line_pointer <= 0;
             sprites_found <= 0;
             shift_register_load_pointer <= 0;
+
 
 
 

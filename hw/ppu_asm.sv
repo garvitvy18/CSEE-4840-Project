@@ -20,13 +20,14 @@ module PPU_asm(
     output logic [8:0] [31:0] shift_load_data,
     output logic [8:0] shift_enable,
     output logic shift_load_sprite, shift_load_background,
+    output logic [8:0] priority_palette_data,
 
     input logic [31:0] read_data_tile_buffer, read_data_tile_graphics, read_data_sprite_graphics, read_data_OAM,
     input logic [23:0] read_data_color_palettes
 );
 
     //Once per line
-    logic [1279:0] background_line_graphics_buffer;
+    logic [39:0] [31:0] background_line_graphics_buffer;
     logic [39:0] background_line_palette_buffer;
     logic [7:0] [31:0] sprite_graphics_buffer;
     logic [7:0] [6:0] sprites_on_line;
@@ -75,7 +76,7 @@ module PPU_asm(
             shift_load_sprite <= 0;
             sprite_palette_buffer <= 0;
             sprites_on_line_palettes <= 0;
-            background_line_graphics_buffer <= 1280'b0;
+            priority_palette_data <= 0;
             background_line_palette_buffer <= 40'b0;
             for (int i = 0; i < 128; i = i + 1) begin
                 sprite_x_buffer[i] <= 0;
@@ -84,9 +85,13 @@ module PPU_asm(
                 sprite_rotation_buffer[i] <= 0;
             end
             for (int i = 0; i < 8; i += 1) begin
-                 sprite_graphics_buffer[i] <= 0;
-                 sprites_on_line[i] <= 0;
-                 shift_load_data[i] <= 0;
+                sprite_graphics_buffer[i] <= 0;
+                sprites_on_line[i] <= 0;
+                shift_load_data[i] <= 0;
+                priority_pixel_data[i] <= 0;
+            end
+            for (int i = 0; i < 40; i += 1) begin
+                background_line_graphics_buffer[i] <= 0;
             end
 
         end
@@ -308,7 +313,7 @@ module PPU_asm(
                     
                 endcase
 
-                background_line_graphics_buffer[(background_line_pointer - 1) * 31 -: 32] <= read_data_tile_graphics;
+                background_line_graphics_buffer[(background_line_pointer - 1)] <= read_data_tile_graphics;
 
                 background_line_pointer <= background_line_pointer + 1;
 
@@ -322,7 +327,7 @@ module PPU_asm(
                 addr_tile_buffer <= 0;
                 addr_tile_graphics <= 0;
 
-                background_line_graphics_buffer[(background_line_pointer - 1) * 31 -: 32] <= read_data_tile_graphics;
+                background_line_graphics_buffer[background_line_pointer - 1] <= read_data_tile_graphics;
 
                 background_line_pointer <= background_line_pointer + 1;
 
@@ -435,14 +440,22 @@ module PPU_asm(
             sprites_found <= 0;
             shift_register_load_pointer <= 0;
             sprites_on_line_palettes <= 0;
+            shift_enable[8] <= 1;
 
             //Logic to load new background tile and palette into shift registers
-
+            if (hcount[3:0] == 0) begin
+                shift_load_data[8] <= background_line_graphics_buffer[hcount[10:4]];
+                shift_load_background <= 1;
+            end
+            else shift_load_background <= 0;
 
             //Logic to enable and disable shift registers
-
-
-            //Logic to call priority encoder
+            for (int i = 0; i < 8; i += 1) begin
+                if ((sprite_x_buffer[sprites_on_line[i]] >= hcount) && ((sprite_x_buffer[sprites_on_line[i]] < hcount + 16))) 
+                    shift_enable[i] <= 1;
+                else 
+                    shift_enable[i] <= 0;
+            end
 
 
         end

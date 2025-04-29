@@ -30,6 +30,7 @@ module PPU_asm(
     logic [39:0] background_line_palette_buffer;
     logic [7:0] [31:0] sprite_graphics_buffer;
     logic [7:0] [6:0] sprites_on_line;
+    logic [7:0] sprites_on_line_palletes;
 
     //Once per frame
     logic [8:0] [23:0] color_palette_buffer;
@@ -73,6 +74,7 @@ module PPU_asm(
             shift_load_background <= 0;
             shift_load_sprite <= 0;
             sprite_palette_buffer <= 0;
+            sprites_on_line_palettes <= 0;
             background_line_graphics_buffer <= 1280'b0;
             background_line_palette_buffer <= 40'b0;
             for (int i = 0; i < 128; i = i + 1) begin
@@ -340,6 +342,7 @@ module PPU_asm(
                 //If current sprite is on the line and we have not filled all the sprite slots
                 if (sprites_found < 8 && (vcount >= sprite_y_buffer[sprites_on_line_pointer]) && (vcount < sprite_y_buffer[sprites_on_line_pointer] + 16)) begin
                     sprites_on_line[sprites_found] <= sprites_on_line_pointer;
+                    sprites_on_line_palettes[sprites_found] <= sprite_palette_buffer[sprites_on_line_pointer];
                     sprites_found <= sprites_found + 1;
                 end
                 
@@ -431,8 +434,15 @@ module PPU_asm(
             sprites_on_line_pointer <= 0;
             sprites_found <= 0;
             shift_register_load_pointer <= 0;
+            sprites_on_line_palettes <= 0;
+
+            //Logic to load new background tile and palette into shift registers
 
 
+            //Logic to enable and disable shift registers
+
+
+            //Logic to call priority encoder
 
 
         end

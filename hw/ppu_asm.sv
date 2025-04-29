@@ -388,13 +388,13 @@ module PPU_asm(
 
                 shift_load_sprite <= 1;
                 shift_load_data[7:0] <= sprite_graphics_buffer;
+                shift_register_load_pointer <= shift_register_load_pointer + 1;
 
             end
                 
 
             else begin 
                 shift_load_sprite <= 0;
-                shift_load_data[7:0] <= 0;
                 rw_sprite_graphics <= 0;
                 addr_sprite_graphics <= 0;
             end

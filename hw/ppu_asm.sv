@@ -342,6 +342,7 @@ module PPU_asm(
                     sprites_on_line[sprites_found] <= sprites_on_line_pointer;
                     sprites_found <= sprites_found + 1;
                 end
+                
                 sprites_on_line_pointer <= sprites_on_line_pointer + 1;
             end
 
@@ -349,7 +350,10 @@ module PPU_asm(
             else if (shift_register_load_pointer == 0) begin
                 rw_sprite_graphics <= 0;
                 
+                // If vertical flip bit is set
                 if (sprite_rotation_buffer[sprites_on_line[shift_register_load_pointer]][1]) addr_sprite_graphics <= ((sprite_tile_id_buffer[sprites_on_line[shift_register_load_pointer]]) * 16) + (15 - (vcount - sprite_y_buffer[sprites_on_line[shift_register_load_pointer]]));
+                
+                // If vertical flip bit is not set
                 else addr_sprite_graphics <= ((sprite_tile_id_buffer[sprites_on_line[shift_register_load_pointer]]) * 16) + (vcount - sprite_y_buffer[sprites_on_line[shift_register_load_pointer]]);
                 
                 shift_register_load_pointer <= shift_register_load_pointer + 1;
@@ -360,14 +364,22 @@ module PPU_asm(
 
                 rw_sprite_graphics <= 0;
                 
+                // If vertical flip bit is set
                 if (sprite_rotation_buffer[sprites_on_line[shift_register_load_pointer]][1]) addr_sprite_graphics <= ((sprite_tile_id_buffer[sprites_on_line[shift_register_load_pointer]]) * 16) + (15 - (vcount - sprite_y_buffer[sprites_on_line[shift_register_load_pointer]]));
+
+                // If vertical flip bit is not set
                 else addr_sprite_graphics <= ((sprite_tile_id_buffer[sprites_on_line[shift_register_load_pointer]]) * 16) + (vcount - sprite_y_buffer[sprites_on_line[shift_register_load_pointer]]);
                 
                 //Check against sprites_found to make sure we don't load garbage data into the graphics buffers
                 if (sprites_on_line_pointer <= sprites_found) begin
+                    // If horizontal flip bit is set
                     if (sprite_rotation_buffer[sprites_on_line[shift_register_load_pointer]][0]) sprite_graphics_buffer[shift_register_load_pointer - 1][31:0] <= read_data_sprite_graphics[0:31];
+                    // If horizontal flip bit is not set
                     else sprite_graphics_buffer[shift_register_load_pointer - 1] <= read_data_sprite_graphics;
-                end else sprite_graphics_buffer[shift_register_load_pointer - 1] <= 0;
+                end 
+                //If sprite slot is empty, fill place in sprite graphics buffer with zeros
+                else sprite_graphics_buffer[shift_register_load_pointer - 1] <= 0;
+                
                 shift_register_load_pointer <= shift_register_load_pointer + 1;
 
             end
@@ -379,9 +391,13 @@ module PPU_asm(
 
                 //Check against sprites_found to make sure we don't load garbage data into the graphic buffers
                 if (sprites_on_line_pointer <= sprites_found) begin
+                    // If horizontal flip bit is set
                     if (sprite_rotation_buffer[sprites_on_line[shift_register_load_pointer]][0]) sprite_graphics_buffer[shift_register_load_pointer - 1][31:0] <= read_data_sprite_graphics[0:31];
+                    // If horizontal flip bit is not set
                     else sprite_graphics_buffer[shift_register_load_pointer - 1] <= read_data_sprite_graphics;
-                end else sprite_graphics_buffer[shift_register_load_pointer - 1] <= 0;
+                end 
+                //If sprite slot is empty, fill place in sprite graphics buffer with zeros
+                else sprite_graphics_buffer[shift_register_load_pointer - 1] <= 0;
 
                 shift_register_load_pointer <= shift_register_load_pointer + 1;
 
@@ -393,6 +409,7 @@ module PPU_asm(
 
                 shift_load_sprite <= 1;
                 shift_load_data[7:0] <= sprite_graphics_buffer;
+                
                 shift_register_load_pointer <= shift_register_load_pointer + 1;
 
             end
@@ -403,6 +420,7 @@ module PPU_asm(
                 addr_sprite_graphics <= 0;
             end
         end
+
         else begin
             //Reset vblank and hsync memory pointers
             coords_sprite_load <= 0;

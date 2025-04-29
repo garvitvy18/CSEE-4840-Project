@@ -9,6 +9,7 @@ module PPU_asm(
     input logic [9:0] vcount,
     input logic vblank,
     input logic hsync,
+    output logic [23:0] pixel_color,
 
     output logic rw_tile_buffer, rw_tile_graphics, rw_sprite_graphics, rw_color_palettes, rw_OAM,
     output logic [31:0] write_data_tile_buffer, write_data_tile_graphics, write_data_sprite_graphics, write_data_OAM,
@@ -20,7 +21,10 @@ module PPU_asm(
     output logic [8:0] [31:0] shift_load_data,
     output logic [8:0] shift_enable,
     output logic shift_load_sprite, shift_load_background,
-    output logic [8:0] priority_palette_data,
+    output logic [8:0] priority_palette_data_out,
+    input logic [1:0] priority_pixel_data_in,
+    input logic priority_palette_data_in,
+
 
     input logic [31:0] read_data_tile_buffer, read_data_tile_graphics, read_data_sprite_graphics, read_data_OAM,
     input logic [23:0] read_data_color_palettes
@@ -444,8 +448,14 @@ module PPU_asm(
 
             //Logic to load new background tile and palette into shift registers
             if (hcount[3:0] == 0) begin
+                
                 shift_load_data[8] <= background_line_graphics_buffer[hcount[10:4]];
+        
+                //load color palette data
+
+
                 shift_load_background <= 1;
+
             end
             else shift_load_background <= 0;
 
@@ -456,6 +466,8 @@ module PPU_asm(
                 else 
                     shift_enable[i] <= 0;
             end
+
+            //Convert pixel data to colors
 
 
         end

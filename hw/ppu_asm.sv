@@ -466,7 +466,7 @@ module PPU_asm(
             end
 
             //Convert pixel data to colors
-
+            pixel_color <= color_palette_buffer[priority_pixel_data_in + (4 * priority_palette_data_in)];
 
         end
     end

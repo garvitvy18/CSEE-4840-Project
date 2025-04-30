@@ -2,13 +2,13 @@ module PPU_asm(
     input logic clk, //Clock
     input logic reset, //Active High Reset
 
-    input logic [10:0] hcount,
-    input logic [9:0] vcount,
-    input logic vblank,
-    input logic hsync,
-    output logic [23:0] pixel_color,
+    input logic [10:0] hcount, //VGA hcount from VGA Controller
+    input logic [9:0] vcount, //VGA vcount from VGA Controller
+    input logic vblank, //VGA vblank from VGA Controller
+    input logic hsync, //VGA hsync from VGA Controller
+    output logic [23:0] pixel_color, //Pixel Color to Send to VGA Controller
 
-    output logic rw_tile_buffer, 
+    output logic rw_tile_buffer, //Read/write signal to the tile buffer memory
     output logic rw_tile_graphics, 
     output logic rw_sprite_graphics, 
     output logic rw_color_palettes, 

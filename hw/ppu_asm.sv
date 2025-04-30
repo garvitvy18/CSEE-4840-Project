@@ -1,9 +1,6 @@
 module PPU_asm( 
-    input logic clk,
-    input logic reset,
-    input logic [31:0] write_data,
-    input logic write,
-    input chipselect,
+    input logic clk, //Clock
+    input logic reset, //Active High Reset
 
     input logic [10:0] hcount,
     input logic [9:0] vcount,
@@ -11,22 +8,34 @@ module PPU_asm(
     input logic hsync,
     output logic [23:0] pixel_color,
 
-    output logic rw_tile_buffer, rw_tile_graphics, rw_sprite_graphics, rw_color_palettes, rw_OAM,
-    output logic [31:0] write_data_tile_buffer, write_data_tile_graphics, write_data_sprite_graphics, write_data_OAM,
+    output logic rw_tile_buffer, 
+    output logic rw_tile_graphics, 
+    output logic rw_sprite_graphics, 
+    output logic rw_color_palettes, 
+    output logic rw_OAM,
+    output logic [31:0] write_data_tile_buffer, 
+    output logic [31:0] write_data_tile_graphics, 
+    output logic [31:0] write_data_sprite_graphics, 
+    output logic [31:0] write_data_OAM,
     output logic [23:0] write_data_color_palettes,
     output logic [8:0] addr_tile_buffer,
-    output logic [10:0] addr_tile_graphics, addr_sprite_graphics,
+    output logic [10:0] addr_tile_graphics, 
+    output logic [10:0] addr_sprite_graphics,
     output logic [2:0] addr_color_palettes,
     output logic [7:0] addr_OAM,
     output logic [8:0] [31:0] shift_load_data,
     output logic [8:0] shift_enable,
-    output logic shift_load_sprite, shift_load_background,
+    output logic shift_load_sprite, 
+    output logic shift_load_background,
     output logic [8:0] priority_palette_data_out,
     input logic [1:0] priority_pixel_data_in,
     input logic priority_palette_data_in,
 
 
-    input logic [31:0] read_data_tile_buffer, read_data_tile_graphics, read_data_sprite_graphics, read_data_OAM,
+    input logic [31:0] read_data_tile_buffer, 
+    input logic [31:0]read_data_tile_graphics, 
+    input logic [31:0]read_data_sprite_graphics, 
+    input logic [31:0]read_data_OAM,
     input logic [23:0] read_data_color_palettes
 );
 

@@ -1,11 +1,11 @@
 module vga(
     input logic clk,
     input logic reset,
-    input logic [23:0] pixel_color;
+    input logic [23:0] pixel_color,
     output logic [7:0] VGA_R, VGA_G, VGA_B,
-    output logic VGA_CLK, VGA_HS, VGA_VS, VGA_BLANK_n, VGA_SYNC_n
-    output logic [10:0] hcount;
-    output logic [9:0] vcount;
+    output logic VGA_CLK, VGA_HS, VGA_VS, VGA_BLANK_n, VGA_SYNC_n,
+    output logic [10:0] hcount,
+    output logic [9:0] vcount
 );
 
 logic [10:0] hcount;

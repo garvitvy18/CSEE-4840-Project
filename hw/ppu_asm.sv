@@ -35,7 +35,7 @@ module PPU_asm(
     input logic [31:0]read_data_tile_graphics, 
     input logic [31:0]read_data_sprite_graphics, 
     input logic [31:0]read_data_OAM,
-    input logic [23:0] read_data_color_palettes
+    input logic [23:0] read_data_color_palettes,
 
     //Shift Register Signals
     output logic [8:0] [31:0] shift_load_data,
@@ -46,7 +46,7 @@ module PPU_asm(
     //Priority Encoder Signals
     output logic [8:0] priority_palette_data_out,
     input logic [1:0] priority_pixel_data_in,
-    input logic priority_palette_data_in,
+    input logic priority_palette_data_in
 );
 
     //Buffers Updated During Vblank

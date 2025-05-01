@@ -3,6 +3,7 @@ module ppu_top(
     input logic clk,
     input logic reset,
     input logic [31:0] write_data,
+    input logic [31:0] address,
     input logic write,
     input chipselect,
     output logic irq,

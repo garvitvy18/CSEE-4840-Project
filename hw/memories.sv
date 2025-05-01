@@ -2,7 +2,7 @@ module tile_buffer(
     input logic clk, reset, rw_1, rw_2,
     input logic [31:0] write_data_1, write_data_2,
     input logic [8:0] addr_1, addr_2,
-    output logic [31:0] read_data_1, read_data_2,
+    output logic [31:0] read_data_1, read_data_2
 );
 
     logic tile_buffer_array [299:0] [31:0];
@@ -20,7 +20,7 @@ module tile_graphics(
     input logic clk, reset, rw_1, rw_2,
     input logic [31:0] write_data_1, write_data_2,
     input [10:0] addr_1, addr_2,
-    output logic [31:0] read_data_1, read_data_2,
+    output logic [31:0] read_data_1, read_data_2
 );
 
     logic tile_graphics_array [2047:0] [31:0];
@@ -38,7 +38,7 @@ module sprite_graphics(
     input logic clk, reset, rw_1, rw_2,
     input logic [31:0] write_data_1, write_data_2, 
     input [10:0] addr_1, addr_2,
-    output logic [31:0] read_data_1, read_data_2,
+    output logic [31:0] read_data_1, read_data_2
 );
 
     logic sprite_graphics_array [2047:0] [31:0];
@@ -56,7 +56,7 @@ module color_palettes(
     input logic clk, reset, rw_1, rw_2,
     input logic [23:0] write_data_1, write_data_2, 
     input [2:0] addr_1, addr_2,
-    output logic [23:0] read_data_1, read_data_2,
+    output logic [23:0] read_data_1, read_data_2
 );
 
     logic color_palette_array [7:0] [23:0];
@@ -74,7 +74,7 @@ module OAM (
     input logic clk, reset, rw_1, rw_2,
     input logic [31:0] write_data_1, write_data_2, 
     input [7:0] addr_1, addr_2,
-    output logic [31:0] read_data_1, read_data_2,
+    output logic [31:0] read_data_1, read_data_2
 )
 
     logic OAM_array [255:0] [31:0];

@@ -8,14 +8,8 @@ module tile_buffer(
     logic tile_buffer_array [299:0] [31:0];
 
     always @(posedge clk) begin
-        if (reset) begin
-            for (int i = 0; i < 300; i += 1) tile_buffer_array[i] <= 0;
-            read_data <= 0;
-        end
-        else begin
-            if (rw) tile_buffer_array[addr] <= write_data;
-            else read_data <= tile_buffer_array[addr];
-        end
+        if (rw) tile_buffer_array[addr] <= write_data;
+        else read_data <= tile_buffer_array[addr];
     end
 
 endmodule 
@@ -30,14 +24,8 @@ module tile_graphics(
     logic tile_graphics_array [2047:0] [31:0];
 
     always @(posedge clk) begin
-        if (reset) begin
-            for (int i = 0; i < 2048; i += 1) tile_graphics_array[i] <= 0;
-            read_data <= 0;
-        end
-        else begin
             if (rw) tile_graphics_array[addr] <= write_data;
             else read_data <= tile_graphics_array[addr];
-        end
     end
 
 endmodule 
@@ -52,14 +40,8 @@ module sprite_graphics(
     logic sprite_graphics_array [2047:0] [31:0];
 
     always @(posedge clk) begin
-        if (reset) begin
-            for (int i = 0; i < 2048; i += 1) sprite_graphics_array[i] <= 0;
-            read_data <= 0;
-        end
-        else begin
             if (rw) sprite_graphics_array[addr] <= write_data;
             else read_data <= sprite_graphics_array[addr];
-        end
     end
 
 endmodule 
@@ -74,14 +56,8 @@ module color_palettes(
     logic color_palette_array [7:0] [23:0];
 
     always @(posedge clk) begin
-        if (reset) begin
-            for (int i = 0; i < 8; i += 1) color_palette_array[i] <= 0;
-            read_data <= 0;
-        end
-        else begin
             if (rw) color_palette_array[addr] <= write_data;
             else read_data <= color_palette_array[addr];
-        end
     end
 
 endmodule
@@ -96,14 +72,8 @@ module OAM (
     logic OAM_array [255:0] [31:0];
 
     always @(posedge clk) begin
-        if (reset) begin
-            for (int i = 0; i < 256; i += 1) OAM_array[i] <= 0;
-            read_data <= 0;
-        end
-        else begin
             if (rw) OAM_array[addr] <= write_data;
             else read_data <= OAM_array[addr];
-        end
     end
 
 endmodule

@@ -2,51 +2,54 @@ module PPU_asm(
     input logic clk, //Clock
     input logic reset, //Active High Reset
 
+    //VGA related IO
     input logic [10:0] hcount, //VGA hcount from VGA Controller
     input logic [9:0] vcount, //VGA vcount from VGA Controller
     input logic vblank, //VGA vblank from VGA Controller
     input logic hsync, //VGA hsync from VGA Controller
     output logic [23:0] pixel_color, //Pixel Color to Send to VGA Controller
 
-    output logic rw_tile_buffer, //Read/write signal to the tile buffer memory
+    //RW Signals to Memories
+    output logic rw_tile_buffer, 
     output logic rw_tile_graphics, 
     output logic rw_sprite_graphics, 
     output logic rw_color_palettes, 
     output logic rw_OAM,
+
+    //Write Data to Memories
     output logic [31:0] write_data_tile_buffer, 
     output logic [31:0] write_data_tile_graphics, 
     output logic [31:0] write_data_sprite_graphics, 
     output logic [31:0] write_data_OAM,
     output logic [23:0] write_data_color_palettes,
+
+    //Address Signals to Memories
     output logic [8:0] addr_tile_buffer,
     output logic [10:0] addr_tile_graphics, 
     output logic [10:0] addr_sprite_graphics,
     output logic [2:0] addr_color_palettes,
     output logic [7:0] addr_OAM,
-    output logic [8:0] [31:0] shift_load_data,
-    output logic [8:0] shift_enable,
-    output logic shift_load_sprite, 
-    output logic shift_load_background,
-    output logic [8:0] priority_palette_data_out,
-    input logic [1:0] priority_pixel_data_in,
-    input logic priority_palette_data_in,
 
-
+    //Read Data from Memories
     input logic [31:0] read_data_tile_buffer, 
     input logic [31:0]read_data_tile_graphics, 
     input logic [31:0]read_data_sprite_graphics, 
     input logic [31:0]read_data_OAM,
     input logic [23:0] read_data_color_palettes
+
+    //Shift Register Signals
+    output logic [8:0] [31:0] shift_load_data,
+    output logic [8:0] shift_enable,
+    output logic shift_load_sprite, 
+    output logic shift_load_background,
+
+    //Priority Encoder Signals
+    output logic [8:0] priority_palette_data_out,
+    input logic [1:0] priority_pixel_data_in,
+    input logic priority_palette_data_in,
 );
 
-    //Once per line
-    logic [39:0] [31:0] background_line_graphics_buffer;
-    logic [39:0] background_line_palette_buffer;
-    logic [7:0] [31:0] sprite_graphics_buffer;
-    logic [7:0] [6:0] sprites_on_line;
-    logic [7:0] sprites_on_line_palettes;
-
-    //Once per frame
+    //Buffers Updated During Vblank
     logic [8:0] [23:0] color_palette_buffer;
     logic [127:0] [15:0] sprite_x_buffer;
     logic [127:0] [15:0] sprite_y_buffer;
@@ -54,13 +57,19 @@ module PPU_asm(
     logic [127:0] [6:0] sprite_tile_id_buffer;
     logic [127:0] [1:0] sprite_rotation_buffer;
 
-    //Vblank memory access pointers
+    //Buffers Updated During Hsync
+    logic [39:0] [31:0] background_line_graphics_buffer;
+    logic [39:0] background_line_palette_buffer;
+    logic [7:0] [31:0] sprite_graphics_buffer;
+    logic [7:0] [6:0] sprites_on_line;
+    logic [7:0] sprites_on_line_palettes;
+
+    //Vblank memory access trackers
     logic [7:0] cords_sprite_load;
     logic [7:0] palette_sprite_load;
     logic [3:0] palette_ram_pointer;
     
-
-    //Hsync memory access pointers
+    //Hsync memory access trackers
     logic [5:0] background_line_pointer;
     logic [2:0] sprite_graphics_pointer;
     logic [7:0] sprites_on_line_pointer;

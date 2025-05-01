@@ -118,44 +118,54 @@ module PPU_asm(
 
         end
 
+        /* 
+        Note that reading from any of the memories in memories.sv takes 2 cycles. On cycle 1, we give the memory the address
+        we want to read from. On cycle 2, we get the data at that address on the memories respective read_data line. As such,
+        you will notice that when filling the buffers from memory, there is a one cycle offset between sending the address and 
+        filling the buffer, hence the at first confusing four tiered if statements. For the first one, we only send the address
+        since we have no data to load. For the second, we load the data for the previous address and send the next address. For
+        the third one we have no new addresses to send but we still need to received and load the final data return into the buffer.
+        For the fourth one, we are done with both addresses and reading data.
+        */
+
         //set buffers that fill once per frame
         else if (vblank) begin
 
             //fill color_palette_buffer
             if (palette_ram_pointer == 0) begin
-                rw_color_palettes <= 0;
-                addr_color_palettes <= palette_ram_pointer;
+                rw_color_palettes <= 0; //Set color palette memory to read
+                addr_color_palettes <= palette_ram_pointer; 
                 palette_ram_pointer <= palette_ram_pointer + 1;
             end
 
             else if (palette_ram_pointer < 8) begin
-                rw_color_palettes <= 0;
+                rw_color_palettes <= 0; //Set color palette memory to read
                 addr_color_palettes <= palette_ram_pointer;
                 color_palette_buffer[palette_ram_point - 1] = read_data_color_palettes;
                 palette_ram_pointer <= palette_ram_pointer + 1;
             end
 
             else if (palette_ram_point = 8) begin
-                rw_color_palettes <= 0;
+                rw_color_palettes <= 0; //Set color palette memory to read
                 addr_color_palettes <= 0;
                 color_palette_buffer[palette_ram_point - 1] = read_data_color_palettes;
                 palette_ram_pointer <= palette_ram_pointer + 1;
             end
 
             else begin
-                rw_color_palettes <= 0;
+                rw_color_palettes <= 0; //Set color palette memory to read
                 addr_color_palettes <= 0;
             end
             
             //fill sprite_x_buffer and sprite_y_buffer
             if (cords_sprite_load == 0) begin
-                rw_OAM <= 0;
+                rw_OAM <= 0; //Set OAM memory to read
                 addr_OAM <= cords_sprite_load * 2 + 1;
                 cords_sprite_load <= cords_sprite_load + 1;
             end
 
             else if (cords_sprite_load < 128) begin
-                rw_OAM <= 0;
+                rw_OAM <= 0; //Set OAM memory to read
                 addr_OAM <= cords_sprite_load * 2 + 1;
                 sprite_x_buffer[cords_sprite_load - 1] <= read_data_OAM[15:0];
                 sprite_y_buffer[cords_sprite_load - 1] <= read_data_OAM[31:16];
@@ -163,7 +173,7 @@ module PPU_asm(
             end
 
             else if (cords_sprite_load == 128) begin
-                rw_OAM <= 0;
+                rw_OAM <= 0; //Set OAM memory to read
                 addr_OAM <= palette_sprite_load;
                 sprite_x_buffer[cords_sprite_load - 1] <= read_data_OAM[15:0];
                 sprite_y_buffer[cords_sprite_load - 1] <= read_data_OAM[31:16];
@@ -172,7 +182,7 @@ module PPU_asm(
             end
 
             else if (palette_sprite_load < 128) begin
-                rw_OAM <= 0;
+                rw_OAM <= 0; //Set OAM memory to read
                 addr_OAM <= palette_sprite_load * 2;
                 sprite_palette_buffer[palette_sprite_load - 1] <= read_data_OAM[7];
                 sprite_tile_id_buffer[palette_sprite_load - 1] <= read_data_OAM[6:0];
@@ -181,7 +191,7 @@ module PPU_asm(
             end
 
             else if (palette_sprite_load == 128) begin
-                rw_OAM <= 0;
+                rw_OAM <= 0; //Set OAM memory to read
                 addr_OAM <= 0;
                 sprite_palette_buffer[palette_sprite_load - 1] <= read_data_OAM[7];
                 sprite_tile_id_buffer[palette_sprite_load - 1] <= read_data_OAM[6:0];
@@ -190,7 +200,7 @@ module PPU_asm(
             end
 
             else begin
-                rw_OAM <= 0;
+                rw_OAM <= 0; //Set OAM memory to read
                 addr_OAM <= 0;
             end
 
@@ -202,7 +212,7 @@ module PPU_asm(
 
             if (background_line_pointer == 0) begin
                 
-                rw_tile_buffer <= 0;
+                rw_tile_buffer <= 0; //Set tile buffer memory to read
 
                 /*Calculate address into the tile buffer for tile at the start of the current line. 
                 We do *10 and not *40 since each 32-bit entry of the tile-buffer holds 4 tile IDs */
@@ -214,7 +224,7 @@ module PPU_asm(
 
             else if (background_line_pointer == 1) begin
 
-                rw_tile_buffer <= 0;
+                rw_tile_buffer <= 0; //Set tile buffer memory to read
                 rw_tile_graphics <= 0;
 
                 /*Calculate address into the tile buffer for current tile being processed.
@@ -258,7 +268,7 @@ module PPU_asm(
 
             else if (background_line_pointer < 40) begin
 
-                rw_tile_buffer <= 0;
+                rw_tile_buffer <= 0; //Set tile buffer memory to read
                 rw_tile_graphics <= 0;
 
                 /*Calculate address into the tile buffer for current tile being processed.
@@ -302,7 +312,7 @@ module PPU_asm(
 
             else if (background_line_pointer == 40) begin
 
-                rw_tile_buffer <= 0;
+                rw_tile_buffer <= 0; //Set tile buffer memory to read
                 rw_tile_graphics <= 0;
 
                 addr_tile_buffer <= 0;
@@ -343,7 +353,7 @@ module PPU_asm(
 
             else if (background_line_pointer == 41) begin
 
-                rw_tile_buffer <= 0;
+                rw_tile_buffer <= 0; //Set tile buffer memory to read
                 rw_tile_graphics <= 0;
 
                 addr_tile_buffer <= 0;
@@ -356,7 +366,7 @@ module PPU_asm(
             end
 
             else begin
-                rw_tile_buffer <= 0;
+                rw_tile_buffer <= 0; //Set tile buffer memory to read
                 rw_tile_graphics <= 0;
 
                 addr_tile_buffer <= 0;

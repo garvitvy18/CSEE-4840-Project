@@ -21,7 +21,7 @@ end
 endmodule
 
 module shift_register_block(
-    input logic [31:0] load_data [8:0] ,
+    input logic [31:0] load_data [8:0],
     input logic clk, reset, load_sprite, load_background,
     input logic [8:0] enable,
     output logic [1:0] out_data [8:0] 

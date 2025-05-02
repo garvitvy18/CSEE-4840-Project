@@ -38,7 +38,7 @@ module PPU_asm(
     input logic [23:0] read_data_color_palettes,
 
     //Shift Register Signals
-    output logic [8:0] [31:0] shift_load_data,
+    output logic [31:0] shift_load_data [8:0],
     output logic [8:0] shift_enable,
     output logic shift_load_sprite, 
     output logic shift_load_background,
@@ -50,18 +50,18 @@ module PPU_asm(
 );
 
     //Buffers Updated During Vblank
-    logic [8:0] [23:0] color_palette_buffer;
-    logic [127:0] [15:0] sprite_x_buffer;
-    logic [127:0] [15:0] sprite_y_buffer;
+    logic [23:0] color_palette_buffer [8:0];
+    logic [15:0] sprite_x_buffer [127:0];
+    logic [15:0] sprite_y_buffer [127:0];
     logic [127:0] sprite_palette_buffer;
-    logic [127:0] [6:0] sprite_tile_id_buffer;
-    logic [127:0] [1:0] sprite_rotation_buffer;
+    logic [6:0] sprite_tile_id_buffer [127:0];
+    logic [1:0] sprite_rotation_buffer [127:0];
 
     //Buffers Updated During Hsync
-    logic [39:0] [31:0] background_line_graphics_buffer;
+    logic [31:0] background_line_graphics_buffer [39:0];
     logic [39:0] background_line_palette_buffer;
-    logic [7:0] [31:0] sprite_graphics_buffer;
-    logic [7:0] [6:0] sprites_on_line;
+    logic [31:0] sprite_graphics_buffer [7:0];
+    logic [6:0] sprites_on_line [7:0];
     logic [7:0] sprites_on_line_palettes;
 
     //Vblank memory access trackers

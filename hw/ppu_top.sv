@@ -68,7 +68,7 @@ module ppu_top(
     logic vblank;
 
     //Shift Register Signals
-    logic [8:0] [31:0] shift_load_data;
+    logic [31:0] shift_load_data [8:0];
     logic [8:0] shift_enable;
     logic shift_load_sprite; 
     logic shift_load_background;
@@ -77,7 +77,7 @@ module ppu_top(
     logic [8:0] priority_palette_data_asm_to_encoder;
     logic [1:0] priority_pixel_data_encoder_to_asm;
     logic priority_palette_data_encoder_to_asm;
-    logic [8:0] [1:0] priority_pixel_data_shifter_to_encoder;
+    logic [1:0] priority_pixel_data_shifter_to_encode [8:0];
 
       addr_decode decoder(
         .addr(address),

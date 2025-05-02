@@ -21,10 +21,10 @@ end
 endmodule
 
 module shift_register_block(
-    input logic [8:0] [31:0] load_data,
+    input logic [31:0] load_data [8:0] ,
     input logic clk, reset, load_sprite, load_background,
     input logic [8:0] enable,
-    output logic [8:0] [1:0] out_data
+    output logic [1:0] out_data [8:0] 
 );
 
     shift_register sprite_shift[8:0] (load_data[7:0], enable[7:0], clk, reset, load_sprite, out_data[7:0]);

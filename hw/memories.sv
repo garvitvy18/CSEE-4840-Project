@@ -5,7 +5,7 @@ module tile_buffer(
     output logic [31:0] read_data_1, read_data_2
 );
 
-    logic tile_buffer_array [299:0] [31:0];
+    logic [31:0] tile_buffer_array [299:0];
 
     always @(posedge clk) begin
         if (rw_1) tile_buffer_array[addr_1] <= write_data_1;
@@ -23,7 +23,7 @@ module tile_graphics(
     output logic [31:0] read_data_1, read_data_2
 );
 
-    logic tile_graphics_array [2047:0] [31:0];
+    logic [31:0] tile_graphics_array [2047:0];
 
     always @(posedge clk) begin
         if (rw_1) tile_buffer_array[addr_1] <= write_data_1;
@@ -41,7 +41,7 @@ module sprite_graphics(
     output logic [31:0] read_data_1, read_data_2
 );
 
-    logic sprite_graphics_array [2047:0] [31:0];
+    logic [31:0] sprite_graphics_array [2047:0];
 
     always @(posedge clk) begin
         if (rw_1) tile_buffer_array[addr_1] <= write_data_1;
@@ -59,7 +59,7 @@ module color_palettes(
     output logic [23:0] read_data_1, read_data_2
 );
 
-    logic color_palette_array [7:0] [23:0];
+    logic [23:0] color_palette_array [7:0];
 
     always @(posedge clk) begin
         if (rw_1) tile_buffer_array[addr_1] <= write_data_1;
@@ -77,7 +77,7 @@ module OAM (
     output logic [31:0] read_data_1, read_data_2
 )
 
-    logic OAM_array [255:0] [31:0];
+    logic [31:0] OAM_array [255:0];
 
     always @(posedge clk) begin
         if (rw_1) tile_buffer_array[addr_1] <= write_data_1;

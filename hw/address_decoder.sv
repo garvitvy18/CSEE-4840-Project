@@ -23,7 +23,7 @@ module addr_decode (
     output logic [10:0] addr_tile_graphics, 
     output logic [10:0] addr_sprite_graphics,
     output logic [2:0] addr_color_palettes,
-    output logic [7:0] addr_OAM,
+    output logic [7:0] addr_OAM
 
 );
     always @(*) begin

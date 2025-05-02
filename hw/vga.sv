@@ -8,9 +8,6 @@ module vga(
     output logic [9:0] vcount
 );
 
-logic [10:0] hcount;
-logic [9:0] vcount;
-
 vga_counters counters(.clk50(clk), .*);
 
 always_ff @(posedge clk)

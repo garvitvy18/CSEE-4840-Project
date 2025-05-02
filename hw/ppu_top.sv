@@ -12,10 +12,60 @@ module ppu_top(
     output logic VGA_CLK, VGA_HS, VGA_VS, VGA_BLANK_n, VGA_SYNC_n
 );
 
+    //PPU RW Signals to Memories 
+    logic ppu_rw_tile_buffer;
+    logic ppu_rw_tile_graphics;
+    logic ppu_rw_sprite_graphics;
+    logic ppu_rw_color_palettes;
+    logic ppu_rw_OAM;
+
+    //CPU RW Signals to Memories 
+    logic cpu_rw_tile_buffer;
+    logic cpu_rw_tile_graphics;
+    logic cpu_rw_sprite_graphics;
+    logic cpu_rw_color_palettes;
+    logic cpu_rw_OAM;
+
+    //PPU Write Data to Memories
+    logic [31:0] ppu_write_data_tile_buffer;
+    logic [31:0] ppu_write_data_tile_graphics;
+    logic [31:0] ppu_write_data_sprite_graphics;
+    logic [31:0] ppu_write_data_OAM;
+    logic [23:0] ppu_write_data_color_palettes;
+
+    //CPU Write Data to Memories
+    logic [31:0] cpu_write_data_tile_buffer;
+    logic [31:0] cpu_write_data_tile_graphics;
+    logic [31:0] cpu_write_data_sprite_graphics;
+    logic [31:0] cpu_write_data_OAM;
+    logic [23:0] cpu_write_data_color_palettes;
+
+    //PPU Address Signals to Memories
+    logic [8:0] ppu_addr_tile_buffer;
+    logic [10:0] ppu_addr_tile_graphics;
+    logic [10:0] ppu_addr_sprite_graphics;
+    logic [2:0] ppu_addr_color_palettes;
+    logic [7:0] ppu_addr_OAM;
+
+    //CPU Address Signals to Memories
+    logic [8:0] cpu_addr_tile_buffer;
+    logic [10:0] cpu_addr_tile_graphics;
+    logic [10:0] cpu_addr_sprite_graphics;
+    logic [2:0] cpu_addr_color_palettes;
+    logic [7:0] cpu_addr_OAM;
+
+    //PPU Read Data from Memories
+    logic [31:0] ppu_read_data_tile_buffer;
+    logic [31:0] ppu_read_data_tile_graphics;
+    logic [31:0] ppu_read_data_sprite_graphics;
+    logic [31:0] ppu_read_data_OAM;
+    logic [23:0] ppu_read_data_color_palettes;
+
       addr_decode decoder(
         .addr(),
         .write_data(),
         .chip_select(),
+        .write(),
         .rw_tile_buffer(), 
         .rw_tile_graphics(), 
         .rw_sprite_graphics(), 

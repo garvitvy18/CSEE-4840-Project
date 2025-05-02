@@ -32,9 +32,9 @@ module PPU_asm(
 
     //Read Data from Memories
     input logic [31:0] read_data_tile_buffer, 
-    input logic [31:0]read_data_tile_graphics, 
-    input logic [31:0]read_data_sprite_graphics, 
-    input logic [31:0]read_data_OAM,
+    input logic [31:0] read_data_tile_graphics, 
+    input logic [31:0] read_data_sprite_graphics, 
+    input logic [31:0] read_data_OAM,
     input logic [23:0] read_data_color_palettes,
 
     //Shift Register Signals

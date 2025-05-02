@@ -61,163 +61,178 @@ module ppu_top(
     logic [31:0] ppu_read_data_OAM;
     logic [23:0] ppu_read_data_color_palettes;
 
+    //VGA Singals
+    logic [10:0] hcount;
+    logic [9:0] vcount;
+    logic [23:0] pixel_color;
+    logic vblank;
+
+    //Shift Register Signals
+    logic [8:0] [31:0] shift_load_data;
+    logic [8:0] shift_enable;
+    logic shift_load_sprite; 
+    logic shift_load_background;
+
+    //Priority Encoder Signals
+    logic [8:0] priority_palette_data_asm_to_encoder;
+    logic [1:0] priority_pixel_data_encoder_to_asm;
+    logic priority_palette_data_encoder_to_asm;
+    logic [8:0] [1:0] priority_pixel_data_shifter_to_encoder;
+
       addr_decode decoder(
-        .addr(),
-        .write_data(),
-        .chip_select(),
-        .write(),
-        .rw_tile_buffer(), 
-        .rw_tile_graphics(), 
-        .rw_sprite_graphics(), 
-        .rw_color_palettes(), 
-        .rw_OAM(),
-        .write_data_tile_buffer(), 
-        .write_data_tile_graphics(), 
-        .write_data_sprite_graphics(), 
-        .write_data_OAM(),
-        .write_data_color_palettes(),
-        .addr_tile_buffer(),
-        .addr_tile_graphics(), 
-        .addr_sprite_graphics(),
-        .addr_color_palettes(),
-        .addr_OAM()
+        .addr(address),
+        .write_data(write_data),
+        .chip_select(chipselect),
+        .write(write),
+        .rw_tile_buffer(cpu_rw_tile_buffer), 
+        .rw_tile_graphics(cpu_rw_tile_graphics), 
+        .rw_sprite_graphics(cpu_rw_sprite_graphics), 
+        .rw_color_palettes(cpu_rw_color_palettes), 
+        .rw_OAM(cpu_rw_OAM),
+        .write_data_tile_buffer(cpu_write_data_tile_buffer), 
+        .write_data_tile_graphics(cpu_write_data_tile_graphics), 
+        .write_data_sprite_graphics(cpu_write_data_sprite_graphics), 
+        .write_data_OAM(cpu_write_data_OAM),
+        .write_data_color_palettes(cpu_write_data_color_palettes),
+        .addr_tile_buffer(cpu_addr_tile_buffer),
+        .addr_tile_graphics(cpu_addr_tile_graphics), 
+        .addr_sprite_graphics(cpu_addr_sprite_graphics),
+        .addr_color_palettes(cpu_addr_color_palettes),
+        .addr_OAM(cpu_addr_OAM)
     );
 
 
     tile_buffer tile_buffer_mem (
-        .clk(), 
-        .reset(), 
-        .rw_1(),
-        .rw_2(),
-        .write_data_1(), 
-        .write_data_2(),
-        .addr_1(), 
-        .addr_2(),
-        .read_data_1(), 
+        .clk(clk), 
+        .rw_1(ppu_rw_tile_buffer),
+        .rw_2(cpu_rw_tile_buffer),
+        .write_data_1(ppu_write_data_tile_buffer), 
+        .write_data_2(cpu_write_data_tile_buffer),
+        .addr_1(ppu_addr_tile_buffer), 
+        .addr_2(cpu_addr_tile_buffer),
+        .read_data_1(ppu_read_data_tile_buffer), 
         .read_data_2()
     );
 
     tile_graphics tile_graphics_mem (
-        .clk(), 
-        .reset(), 
-        .rw_1(), 
-        .rw_2(),
-        .write_data_1(), 
-        .write_data_2(),
-        .addr_1(),
-        .addr_2(),
-        .read_data_1(), 
+        .clk(clk), 
+        .rw_1(ppu_rw_tile_graphics), 
+        .rw_2(cpu_rw_tile_graphics),
+        .write_data_1(ppu_write_data_tile_graphics), 
+        .write_data_2(cpu_write_data_tile_graphics),
+        .addr_1(ppu_addr_tile_graphics),
+        .addr_2(cpu_addr_tile_graphics),
+        .read_data_1(ppu_read_data_tile_graphics), 
         .read_data_2()
     );
 
 
     sprite_graphics sprite_graphics_mem (
-        .clk(),
-        .reset(), 
-        .rw_1(), 
-        .rw_2(),
-        .write_data_1(), 
-        .write_data_2(), 
-        .addr_1(), 
-        .addr_2(),
-        .read_data_1(), 
+        .clk(clk),
+        .rw_1(ppu_rw_sprite_graphics), 
+        .rw_2(cpu_rw_sprite_graphics),
+        .write_data_1(ppu_write_data_sprite_graphics), 
+        .write_data_2(cpu_write_data_sprite_graphics), 
+        .addr_1(ppu_addr_sprite_graphics), 
+        .addr_2(cpu_addr_sprite_graphics),
+        .read_data_1(ppu_read_data_sprite_graphics), 
         .read_data_2()
     );
 
 
     color_palettes color_palettes_mem(
-        .clk(), 
-        .reset(),
-        .rw_1(), 
-        .rw_2(),
-        .write_data_1(), 
-        .write_data_2(), 
-        .addr_1(), 
-        .addr_2(),
-        .read_data_1(), 
+        .clk(clk), 
+        .rw_1(ppu_rw_color_palettes), 
+        .rw_2(cpu_rw_color_palettes),
+        .write_data_1(ppu_write_data_color_palettes), 
+        .write_data_2(cpu_write_data_color_palettes), 
+        .addr_1(ppu_addr_color_palettes), 
+        .addr_2(cpu_addr_color_palettes),
+        .read_data_1(ppu_read_data_color_palettes), 
         .read_data_2()
     );
 
     OAM OAM_mem (
-        .clk(), 
-        .reset(), 
-        .rw_1(), 
-        .rw_2(),
-        .write_data_1(),
-        .write_data_2(), 
-        .addr_1(),
-        .addr_2(),
-        .read_data_1(), 
+        .clk(clk),  
+        .rw_1(ppu_rw_OAM), 
+        .rw_2(cpu_rw_OAM),
+        .write_data_1(ppu_write_data_OAM),
+        .write_data_2(cpu_write_data_OAM), 
+        .addr_1(ppu_addr_OAM),
+        .addr_2(cpu_addr_OAM),
+        .read_data_1(ppu_read_data_OAM), 
         .read_data_2()
     );
 
     PPU_asm asm( 
-        .clk(),
-        .reset(),
-        .hcount(), 
-        .vcount(), 
-        .vblank(), 
-        .hsync(), 
-        .pixel_color(),
-        .rw_tile_buffer(), 
-        .rw_tile_graphics(), 
-        .rw_sprite_graphics(), 
-        .rw_color_palettes(), 
-        .rw_OAM(),
-        .write_data_tile_buffer(), 
-        .write_data_tile_graphics(), 
-        .write_data_sprite_graphics(), 
-        .write_data_OAM(),
-        .write_data_color_palettes(),
-        .addr_tile_buffer(),
-        .addr_tile_graphics(), 
-        .addr_sprite_graphics(),
-        .addr_color_palettes(),
-        .addr_OAM(),
-        .read_data_tile_buffer(), 
-        .read_data_tile_graphics(), 
-        .read_data_sprite_graphics(), 
-        .read_data_OAM(),
-        .read_data_color_palettes(),
-        .shift_load_data(),
-        .shift_enable(),
-        .shift_load_sprite(), 
-        .shift_load_background(),
-        .priority_palette_data_out(),
-        .priority_pixel_data_in(),
-        .priority_palette_data_in()
+        .clk(clk),
+        .reset(reset),
+        .hcount(hcount), 
+        .vcount(vcount), 
+        .vblank(vblank), 
+        .hsync(VGA_HS), 
+        .pixel_color(pixel_color),
+        .rw_tile_buffer(ppu_rw_tile_buffer), 
+        .rw_tile_graphics(ppu_rw_tile_graphics), 
+        .rw_sprite_graphics(ppu_rw_sprite_graphics), 
+        .rw_color_palettes(ppu_rw_color_palettes), 
+        .rw_OAM(ppu_rw_OAM),
+        .write_data_tile_buffer(ppu_write_data_tile_buffer), 
+        .write_data_tile_graphics(ppu_write_data_tile_graphics), 
+        .write_data_sprite_graphics(ppu_write_data_sprite_graphics), 
+        .write_data_OAM(ppu_write_data_OAM),
+        .write_data_color_palettes(ppu_write_data_color_palettes),
+        .addr_tile_buffer(ppu_addr_tile_buffer),
+        .addr_tile_graphics(ppu_addr_tile_graphics), 
+        .addr_sprite_graphics(ppu_addr_sprite_graphics),
+        .addr_color_palettes(ppu_addr_color_palettes),
+        .addr_OAM(ppu_addr_OAM),
+        .read_data_tile_buffer(ppu_read_data_tile_buffer), 
+        .read_data_tile_graphics(ppu_read_data_tile_graphics), 
+        .read_data_sprite_graphics(ppu_read_data_sprite_graphics), 
+        .read_data_OAM(ppu_read_data_OAM),
+        .read_data_color_palettes(ppu_read_data_color_palettes),
+        .shift_load_data(shift_load_data),
+        .shift_enable(shift_enable),
+        .shift_load_sprite(shift_load_sprite), 
+        .shift_load_background(shift_load_background),
+        .priority_palette_data_out(priority_palette_data_asm_to_encoder),
+        .priority_pixel_data_in(priority_pixel_data_encoder_to_asm),
+        .priority_palette_data_in(priority_palette_data_encoder_to_asm)
     );
 
     combined_priority_encoder priority_encoder (
-        .pixel_data_in(),
-        .palette_data_in(),
-        .pixel_data_out(),
-        .palette_data_out()
+        .pixel_data_in(priority_pixel_data_shifter_to_encoder),
+        .palette_data_in(priority_palette_data_asm_to_encoder),
+        .pixel_data_out(priority_pixel_data_encoder_to_asm),
+        .palette_data_out(priority_palette_data_encoder_to_asm)
     ):
 
     shift_register shift_registers (
-        .load_data(),
-        .enable(),
-        .clk(), 
-        .reset(), 
-        .load(),
-        .out_data()
+        .load_data(shift_load_data),
+        .clk(clk), 
+        .reset(reset), 
+        .load_sprite(shift_load_sprite), 
+        .load_background(shift_load_background),
+        .enable(shift_enable),
+        .out_data(priority_pixel_data_shifter_to_encoder)
     );
 
     vga (
-        .clk(),
-        .reset(),
-        .pixel_color(),
-        .VGA_R(), 
-        .VGA_G(), 
-        .VGA_B(),
-        .VGA_CLK(), 
-        .VGA_HS(), 
-        .VGA_VS(), 
-        .VGA_BLANK_n(), 
-        .VGA_SYNC_n(),
-        .hcount(),
-        .vcount()
+        .clk(clk),
+        .reset(reset),
+        .pixel_color(pixel_color),
+        .VGA_R(VGA_R), 
+        .VGA_G(VGA_G), 
+        .VGA_B(VGA_B),
+        .VGA_CLK(VGA_CLK), 
+        .VGA_HS(VGA_HS), 
+        .VGA_VS(VGA_VS), 
+        .VGA_BLANK_n(VGA_BLANK_n), 
+        .VGA_SYNC_n(VGA_SYNC_n),
+        .VGA_vBLANK(vblank),
+        .hcount(hcount),
+        .vcount(vcount)
     );
 
 

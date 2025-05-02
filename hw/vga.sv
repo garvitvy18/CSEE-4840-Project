@@ -3,7 +3,7 @@ module vga(
     input logic reset,
     input logic [23:0] pixel_color,
     output logic [7:0] VGA_R, VGA_G, VGA_B,
-    output logic VGA_CLK, VGA_HS, VGA_VS, VGA_BLANK_n, VGA_SYNC_n,
+    output logic VGA_CLK, VGA_HS, VGA_VS, VGA_BLANK_n, VGA_SYNC_n, VGA_vBLANK,
     output logic [10:0] hcount,
     output logic [9:0] vcount
 );
@@ -31,7 +31,7 @@ module vga_counters(
  input logic 	     clk50, reset,
  output logic [10:0] hcount,  // hcount[10:1] is pixel column
  output logic [9:0]  vcount,  // vcount[9:0] is pixel row
- output logic 	     VGA_CLK, VGA_HS, VGA_VS, VGA_BLANK_n, VGA_SYNC_n);
+ output logic 	     VGA_CLK, VGA_HS, VGA_VS, VGA_BLANK_n, VGA_SYNC_n, VGA_vBLANK);
 
 /*
  * 640 X 480 VGA timing for a 50 MHz clock: one pixel every other cycle
@@ -93,6 +93,8 @@ module vga_counters(
    // 110 0011 1111  1599	       10 0000 1100  524
    assign VGA_BLANK_n = !( hcount[10] & (hcount[9] | hcount[8]) ) &
 			!( vcount[9] | (vcount[8:5] == 4'b1111) );
+
+   assign VGA_vBLANK = ( vcount[9] | (vcount[8:5] == 4'b1111) );
 
    /* VGA_CLK is 25 MHz
     *             __    __    __

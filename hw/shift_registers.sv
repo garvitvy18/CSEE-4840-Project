@@ -1,7 +1,7 @@
 module shift_register(
     input logic [31:0] load_data,
     input logic enable, clk, reset, load,
-    output logic [1:0] out_data;
+    output logic [1:0] out_data
 );
 
 logic [31:0] shift_buffer;

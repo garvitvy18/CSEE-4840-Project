@@ -28,6 +28,6 @@ module shift_register_block(
 );
 
     shift_register sprite_shift[8:0] (load_data[7:0], enable[7:0], clk, reset, load_sprite, out_data[7:0]);
-    shift_register background_shift (line_data[8], enable[8], clk, reset, load_background, out_data[8]);
+    shift_register background_shift (load_data[8], enable[8], clk, reset, load_background, out_data[8]);
 
 endmodule

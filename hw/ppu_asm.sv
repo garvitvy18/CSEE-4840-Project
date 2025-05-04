@@ -65,7 +65,7 @@ module PPU_asm(
     logic [7:0] sprites_on_line_palettes;
 
     //Vblank memory access trackers
-    logic [7:0] cords_sprite_load;
+    logic [7:0] coords_sprite_load;
     logic [7:0] palette_sprite_load;
     logic [3:0] palette_ram_pointer;
     

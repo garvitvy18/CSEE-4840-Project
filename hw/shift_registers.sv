@@ -6,16 +6,12 @@ module shift_register(
 
 logic [31:0] shift_buffer;
 
+assign out_data = shift_buffer[1:0];
+
 always @(posedge clk) begin
-    if (reset) begin 
-        shift_buffer <= 0;
-        out_data <= 0;
-    end
+    if (reset) shift_buffer <= 0;
     else if (load) shift_buffer <= load_data;
-    else if (enable) begin
-        out_data <= shift_buffer[1:0];
-        shift_buffer <= shift_buffer >> 2;
-    end
+    else if (enable) shift_buffer <= shift_buffer >> 2;
 end
 
 endmodule

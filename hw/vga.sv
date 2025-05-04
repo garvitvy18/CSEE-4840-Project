@@ -16,7 +16,7 @@ always_ff @(posedge clk)
 	    VGA_G <= 8'h0;
 	    VGA_B <= 8'h0;
     end else begin
-        VGA_R <= pixel_color[23:16];
+      VGA_R <= pixel_color[23:16];
 	    VGA_G <= pixel_color[15:8];
 	    VGA_B <= pixel_color[7:0];
     end

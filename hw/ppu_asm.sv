@@ -206,6 +206,7 @@ module PPU_asm(
 
         end
 
+        //Set buffers that fill once per line
         else if (hsync) begin
 
             //Load background tiles into buffer
@@ -267,7 +268,7 @@ module PPU_asm(
             end
 
             else if (background_line_pointer < 40) begin
-
+                
                 rw_tile_buffer <= 0; //Set tile buffer memory to read
                 rw_tile_graphics <= 0;
 
@@ -275,7 +276,7 @@ module PPU_asm(
                 We do >> 2 since each 32-bit entry of the tile-buffer holds 4 tile IDs */
                 addr_tile_buffer <= (vcount * 10) + (background_line_pointer >> 2); 
 
-        
+                
                 /* Calculate the address into the tile graphics memory for the current line
                 of the current tile being processed */
                 case (background_line_pointer[1:0]) 
@@ -461,7 +462,7 @@ module PPU_asm(
             end
         end
 
-        else begin
+        else begin  
             //Reset vblank and hsync memory pointers
             coords_sprite_load <= 0;
             palette_sprite_load <= 0;
@@ -472,26 +473,34 @@ module PPU_asm(
             sprites_found <= 0;
             shift_register_load_pointer <= 0;
             sprites_on_line_palettes <= 0;
-            shift_enable[8] <= 1;
-            priority_palette_data_out <= {background_line_palette_buffer[hcount[10:4]], sprites_on_line_palettes};
+            priority_palette_data_out <= {background_line_palette_buffer[hcount[10:5]], sprites_on_line_palettes};
 
             //Logic to load new background tile and palette into shift registers
-            if (hcount[3:0] == 0) begin
+            if (hcount[4:0] == 0) begin
                 
-                shift_load_data[8] <= background_line_graphics_buffer[hcount[10:4]];
+                shift_load_data[8] <= background_line_graphics_buffer[hcount[10:5]];
 
                 shift_load_background <= 1;
 
             end
             else shift_load_background <= 0;
 
-            //Logic to enable and disable shift registers
-            for (int i = 0; i < 8; i += 1) begin
-                if ((sprite_x_buffer[sprites_on_line[i]] >= hcount) && ((sprite_x_buffer[sprites_on_line[i]] < hcount + 16))) 
-                    shift_enable[i] <= 1;
-                else 
-                    shift_enable[i] <= 0;
-            end
+           
+            
+            //Logic to handle pixel doubling
+            if (hcount[0] == 0) begin
+
+                shift_enable[8] <= 1;
+
+                //Logic to enable and disable shift registers
+                for (int i = 0; i < 8; i += 1) begin
+                    if ((sprite_x_buffer[sprites_on_line[i]] >= hcount[10:1]) && ((sprite_x_buffer[sprites_on_line[i]] < hcount[10:1] + 16))) 
+                        shift_enable[i] <= 1;
+                    else 
+                        shift_enable[i] <= 0;
+                end
+            end else shift_enable <= 0;
+            
 
             //Convert pixel data to colors
             pixel_color <= color_palette_buffer[priority_pixel_data_in + (4 * priority_palette_data_in)];

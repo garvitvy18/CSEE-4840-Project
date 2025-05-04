@@ -44,7 +44,7 @@ module PPU_asm(
     output logic shift_load_background,
 
     //Priority Encoder Signals
-    output logic [8:0] priority_palette_data_out,
+    output logic  priority_palette_data_out[8:0],
     input logic [1:0] priority_pixel_data_in,
     input logic priority_palette_data_in
 );
@@ -53,7 +53,7 @@ module PPU_asm(
     logic [23:0] color_palette_buffer [8:0];
     logic [15:0] sprite_x_buffer [127:0];
     logic [15:0] sprite_y_buffer [127:0];
-    logic [127:0] sprite_palette_buffer;
+    logic sprite_palette_buffer [127:0];
     logic [6:0] sprite_tile_id_buffer [127:0];
     logic [1:0] sprite_rotation_buffer [127:0];
 
@@ -62,7 +62,7 @@ module PPU_asm(
     logic [39:0] background_line_palette_buffer;
     logic [31:0] sprite_graphics_buffer [7:0];
     logic [6:0] sprites_on_line [7:0];
-    logic [7:0] sprites_on_line_palettes;
+    logic sprites_on_line_palettes[7:0];
 
     //Vblank memory access trackers
     logic [7:0] cords_sprite_load;
@@ -96,23 +96,25 @@ module PPU_asm(
             shift_enable <= 0;
             shift_load_background <= 0;
             shift_load_sprite <= 0;
-            sprite_palette_buffer <= 0;
-            sprites_on_line_palettes <= 0;
-            priority_palette_data_out <= 0;
             background_line_palette_buffer <= 40'b0;
             for (int i = 0; i < 128; i = i + 1) begin
                 sprite_x_buffer[i] <= 0;
                 sprite_y_buffer[i] <= 0;
                 sprite_tile_id_buffer[i] <= 0;
                 sprite_rotation_buffer[i] <= 0;
+		sprite_palette_buffer[i] <= 0;
             end
             for (int i = 0; i < 8; i += 1) begin
                 sprite_graphics_buffer[i] <= 0;
                 sprites_on_line[i] <= 0;
                 shift_load_data[i] <= 0;
+                sprites_on_line_palettes[i] <= 0;
             end
             for (int i = 0; i < 40; i += 1) begin
                 background_line_graphics_buffer[i] <= 0;
+            end
+            for (int i = 0; i < 9; i += 1) begin
+                priority_palette_data_out[i] <= 0;
             end
 
         end
@@ -480,7 +482,9 @@ module PPU_asm(
             sprites_on_line_pointer <= 0;
             sprites_found <= 0;
             shift_register_load_pointer <= 0;
-            sprites_on_line_palettes <= 0;
+            for (int i = 0; i < 8; i += 1) begin
+                sprites_on_line_palettes[i] <= 0;
+            end
             shift_load_sprite <= 0;
             priority_palette_data_out <= {background_line_palette_buffer[hcount[10:5]], sprites_on_line_palettes};
 
@@ -521,5 +525,4 @@ function automatic logic [31:0] bit_reverse32(input logic [31:0] in);
 endfunction
 
 endmodule
-
 

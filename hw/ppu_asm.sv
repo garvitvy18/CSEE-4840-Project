@@ -488,7 +488,7 @@ module PPU_asm(
            
             
             //Logic to handle pixel doubling
-            if (hcount[0] == 0) begin
+            if (hcount[0]) begin
 
                 shift_enable[8] <= 1;
 

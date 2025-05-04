@@ -221,10 +221,6 @@ module ppu_top(
     vga (
         .clk(clk),
         .reset(reset),
-        .pixel_color(pixel_color),
-        .VGA_R(VGA_R), 
-        .VGA_G(VGA_G), 
-        .VGA_B(VGA_B),
         .VGA_CLK(VGA_CLK), 
         .VGA_HS(VGA_HS), 
         .VGA_VS(VGA_VS), 

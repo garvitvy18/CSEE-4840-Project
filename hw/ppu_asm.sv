@@ -146,7 +146,7 @@ module PPU_asm(
                 palette_ram_pointer <= palette_ram_pointer + 1;
             end
 
-            else if (palette_ram_pointer = 8) begin
+            else if (palette_ram_pointer == 8) begin
                 rw_color_palettes <= 0; //Set color palette memory to read
                 addr_color_palettes <= 0;
                 color_palette_buffer[palette_ram_pointer - 1] = read_data_color_palettes;
@@ -223,7 +223,7 @@ module PPU_asm(
                 background_line_pointer <= background_line_pointer + 1;
 
             end
-
+        end
             else if (background_line_pointer == 1) begin
 
                 rw_tile_buffer <= 0; //Set tile buffer memory to read

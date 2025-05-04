@@ -65,7 +65,7 @@ module PPU_asm(
     logic [7:0] sprites_on_line_palettes;
 
     //Vblank memory access trackers
-    logic [7:0] coords_sprite_load;
+    logic [7:0] cords_sprite_load;
     logic [7:0] palette_sprite_load;
     logic [3:0] palette_ram_pointer;
     
@@ -85,7 +85,7 @@ module PPU_asm(
             rw_sprite_graphics <= 0;
             rw_color_palettes <= 0;
             rw_OAM <= 0;
-            coords_sprite_load <= 0;
+            cords_sprite_load <= 0;
             palette_sprite_load <= 0;
             palette_ram_pointer <= 0;
             background_line_pointer <= 0;
@@ -468,7 +468,7 @@ module PPU_asm(
 
         else begin  
             //Reset vblank and hsync memory pointers
-            coords_sprite_load <= 0;
+            cords_sprite_load <= 0;
             palette_sprite_load <= 0;
             palette_ram_pointer <= 0;
             background_line_pointer <= 0;

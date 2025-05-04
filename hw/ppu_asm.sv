@@ -413,8 +413,11 @@ module PPU_asm(
                 //Check against sprites_found to make sure we don't load garbage data into the graphics buffers
                 if (sprites_on_line_pointer <= sprites_found) begin
                     // If horizontal flip bit is set
-                    if (sprite_rotation_buffer[sprites_on_line[shift_register_load_pointer]][0]) sprite_graphics_buffer[shift_register_load_pointer - 1][31:0] <= read_data_sprite_graphics[0:31];
-                    // If horizontal flip bit is not set
+                    //if (sprite_rotation_buffer[sprites_on_line[shift_register_load_pointer]][0]) sprite_graphics_buffer[shift_register_load_pointer - 1][31:0] <= read_data_sprite_graphics[0:31];
+                    if (sprite_rotation_buffer[sprites_on_line[shift_register_load_pointer]][0]) begin
+                      // horizontal‐flip: reverse all bits
+                      sprite_graphics_buffer[shift_register_load_pointer-1] <= bit_reverse32(read_data_sprite_graphics);
+                    end // If horizontal flip bit is not set
                     else sprite_graphics_buffer[shift_register_load_pointer - 1] <= read_data_sprite_graphics;
                 end 
                 //If sprite slot is empty, fill place in sprite graphics buffer with zeros

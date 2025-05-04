@@ -473,6 +473,7 @@ module PPU_asm(
             sprites_found <= 0;
             shift_register_load_pointer <= 0;
             sprites_on_line_palettes <= 0;
+            shift_load_sprite <= 0;
             priority_palette_data_out <= {background_line_palette_buffer[hcount[10:5]], sprites_on_line_palettes};
 
             //Logic to load new background tile and palette into shift registers

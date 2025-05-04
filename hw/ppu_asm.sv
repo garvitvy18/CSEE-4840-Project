@@ -451,9 +451,8 @@ module PPU_asm(
                 shift_load_sprite <= 1;
                 shift_load_data[7:0] <= sprite_graphics_buffer;
 
-                shift_load_data[8] <= background_line_graphics_buffer[0];
-
                 shift_load_background <= 1;
+                shift_load_data[8] <= background_line_graphics_buffer[0];
                 
                 shift_register_load_pointer <= shift_register_load_pointer + 1;
 

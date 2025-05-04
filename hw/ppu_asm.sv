@@ -304,7 +304,7 @@ module PPU_asm(
                     
                 endcase
 
-                background_line_graphics_buffer[(background_line_pointer - 1) * 31 -: 32] <= read_data_tile_graphics;
+                background_line_graphics_buffer[(background_line_pointer - 1)] <= read_data_tile_graphics;
 
                 background_line_pointer <= background_line_pointer + 1;
 

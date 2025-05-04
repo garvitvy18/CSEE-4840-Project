@@ -223,7 +223,7 @@ module PPU_asm(
                 background_line_pointer <= background_line_pointer + 1;
 
             end
-        end
+        
             else if (background_line_pointer == 1) begin
 
                 rw_tile_buffer <= 0; //Set tile buffer memory to read

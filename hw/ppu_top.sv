@@ -76,8 +76,8 @@ module ppu_top(
     logic shift_load_background;
 
     //Priority Encoder Signals
-    logic [8:0] priority_palette_data_asm_to_encoder;
-    logic [1:0] priority_pixel_data_encoder_to_asm;
+    logic priority_palette_data_asm_to_encoder [8:0];
+    logic priority_pixel_data_encoder_to_asm [1:0];
     logic priority_palette_data_encoder_to_asm;
     logic [1:0] priority_pixel_data_shifter_to_encoder [8:0];
 

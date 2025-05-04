@@ -206,7 +206,7 @@ module ppu_top(
         .palette_data_in(priority_palette_data_asm_to_encoder),
         .pixel_data_out(priority_pixel_data_encoder_to_asm),
         .palette_data_out(priority_palette_data_encoder_to_asm)
-    ):
+    );
 
     shift_register shift_registers (
         .load_data(shift_load_data),

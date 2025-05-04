@@ -99,7 +99,6 @@ module PPU_asm(
             sprite_palette_buffer <= 0;
             sprites_on_line_palettes <= 0;
             priority_palette_data_out <= 0;
-            priority_palette_data_in <= 0;
             background_line_palette_buffer <= 40'b0;
             for (int i = 0; i < 128; i = i + 1) begin
                 sprite_x_buffer[i] <= 0;
@@ -111,7 +110,6 @@ module PPU_asm(
                 sprite_graphics_buffer[i] <= 0;
                 sprites_on_line[i] <= 0;
                 shift_load_data[i] <= 0;
-                priority_pixel_data_in[i] <= 0;
             end
             for (int i = 0; i < 40; i += 1) begin
                 background_line_graphics_buffer[i] <= 0;

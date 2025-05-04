@@ -111,7 +111,7 @@ module PPU_asm(
                 sprite_graphics_buffer[i] <= 0;
                 sprites_on_line[i] <= 0;
                 shift_load_data[i] <= 0;
-                priority_pixel_data[i] <= 0;
+                priority_pixel_data_in[i] <= 0;
             end
             for (int i = 0; i < 40; i += 1) begin
                 background_line_graphics_buffer[i] <= 0;

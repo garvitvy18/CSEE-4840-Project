@@ -81,7 +81,7 @@ module PPU_asm(
         //reset 
         if (reset) begin
             rw_tile_buffer <= 0;
-            rw_tile_graphic <= 0;
+            rw_tile_graphics <= 0;
             rw_sprite_graphics <= 0;
             rw_color_palettes <= 0;
             rw_OAM <= 0;

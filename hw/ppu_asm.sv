@@ -141,14 +141,14 @@ module PPU_asm(
             else if (palette_ram_pointer < 8) begin
                 rw_color_palettes <= 0; //Set color palette memory to read
                 addr_color_palettes <= palette_ram_pointer;
-                color_palette_buffer[palette_ram_point - 1] = read_data_color_palettes;
+                color_palette_buffer[palette_ram_pointer - 1] = read_data_color_palettes;
                 palette_ram_pointer <= palette_ram_pointer + 1;
             end
 
-            else if (palette_ram_point = 8) begin
+            else if (palette_ram_pointer = 8) begin
                 rw_color_palettes <= 0; //Set color palette memory to read
                 addr_color_palettes <= 0;
-                color_palette_buffer[palette_ram_point - 1] = read_data_color_palettes;
+                color_palette_buffer[palette_ram_pointer - 1] = read_data_color_palettes;
                 palette_ram_pointer <= palette_ram_pointer + 1;
             end
 

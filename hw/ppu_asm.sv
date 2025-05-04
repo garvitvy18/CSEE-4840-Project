@@ -490,7 +490,7 @@ module PPU_asm(
             end
             else shift_load_background <= 0;
 
-           
+        end 
             
             //Logic to handle pixel doubling
             if (hcount[0]) begin

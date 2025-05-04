@@ -220,7 +220,7 @@ module ppu_top(
         .out_data(priority_pixel_data_shifter_to_encoder)
     );
 
-    vga (
+    vga vga_inst(
         .clk(clk),
         .reset(reset),
         .pixel_color(pixel_color),

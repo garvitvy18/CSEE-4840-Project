@@ -79,7 +79,7 @@ module ppu_top(
     logic [8:0] priority_palette_data_asm_to_encoder;
     logic [1:0] priority_pixel_data_encoder_to_asm;
     logic priority_palette_data_encoder_to_asm;
-    logic [1:0] priority_pixel_data_shifter_to_encode [8:0];
+    logic [1:0] priority_pixel_data_shifter_to_encoder [8:0];
 
       addr_decode decoder(
         .addr(address),

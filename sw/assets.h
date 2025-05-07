@@ -16,9 +16,9 @@ constexpr int PF_LEFT  = (TILE_COLS - PF_WIDTH ) / 2;
 constexpr int PF_TOP   = (TILE_ROWS - PF_HEIGHT) / 2;
 
 //Coordinates for score / lines
-constexpr int HUD_COL = PF_LEFT + PF_WIDTH + 2;  
-constexpr int HUD_SCORE_ROW = PF_TOP + PF_HEIGHT - 9;
-constexpr int HUD_LINES_ROW = HUD_SCORE_ROW + 4;
+constexpr int HUD_COL = 0;
+constexpr int HUD_SCORE_ROW = 35;
+constexpr int HUD_LINES_ROW = HUD_SCORE_ROW + 10;
 
 //Coordinates for next box
 constexpr int NEXT_COL = PF_LEFT + PF_WIDTH + 2;

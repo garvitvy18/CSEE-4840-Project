@@ -199,7 +199,9 @@ static void show_start() {
 static void show_game_over() {
     clear_area(0, 0, 80, 60);
     draw_string(10, 20, "GAME OVER");
-    draw_string(0, 40, "SPACE: RESTART");
+    draw_string(10, 40, "SPACE:");
+    draw_string(20, 40, "RESTART");
+    
 }
 
 //Main program loop

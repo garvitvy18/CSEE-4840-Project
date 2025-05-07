@@ -128,12 +128,12 @@ static void draw_hud(const Tetris& t) {
     sprintf(buf, "%d", t.score());
     clear_area(HUD_COL, HUD_SCORE_ROW, 24, 7);
     draw_string(HUD_COL, HUD_SCORE_ROW, "SCORE");
-    draw_string(HUD_COL, HUD_SCORE_ROW + 2, buf);
+    draw_string(HUD_COL + 40, HUD_SCORE_ROW, buf);
 
     sprintf(buf, "%d", t.lines());
     clear_area(HUD_COL, HUD_LINES_ROW, 24, 7);
     draw_string(HUD_COL, HUD_LINES_ROW, "LINES");
-    draw_string(HUD_COL, HUD_LINES_ROW + 2, buf);
+    draw_string(HUD_COL + 40, HUD_LINES_ROW, buf);
 }
 
 /*
@@ -200,7 +200,7 @@ static void show_game_over() {
     clear_area(0, 0, 80, 60);
     draw_string(10, 20, "GAME OVER");
     draw_string(10, 40, "SPACE:");
-    draw_string(20, 40, "RESTART");
+    draw_string(20, 50, "RESTART");
     
 }
 

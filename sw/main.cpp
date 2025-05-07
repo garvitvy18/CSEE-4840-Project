@@ -92,3 +92,16 @@ static void clear_area(int col,int row,int w,int h)
 Functions for game rendering
 ################################################
 */
+
+//Draw playfield border
+static void draw_borders() {
+    frame(PF_LEFT, PF_TOP, PF_WIDTH, PF_HEIGHT, TILE_WALL);
+    frame(NEXT_COL-1, NEXT_ROW-1, 6, 6, TILE_WALL);
+}
+
+//Draw playfield play area
+static void draw_playfield(const Tetris& game) {
+    for (int y = 0; y < ROWS; ++y)
+        for(int x = 0;x < COLS; ++x)
+            put(PF_LEFT + 1 + x, PF_TOP + 1 + y, game.playfield(x,y));
+}

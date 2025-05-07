@@ -74,8 +74,12 @@ bool Tetris::collision(int nx, int ny, const Tetromino& pc, int r) const {
 //Input movements
 void Tetris::move_left (){ if (!paused && !over && !collision(px - 1, py, cur, rot))--px; }
 void Tetris::move_right(){ if (!paused && !over && !collision(px + 1, py, cur, rot))++px; }
-void Tetris::rotate()    { if (!paused && !over && !collision(px, py, cur, (rot + 1) % 4))rot = (rot + 1) % 4; }
-void Tetris::soft_drop() { if (!paused && !over) ++py; }
+void Tetris::rotate() { if (!paused && !over && !collision(px, py, cur, (rot + 1) % 4))rot = (rot + 1) % 4; }
+void Tetris::soft_drop() { 
+    if (!paused && !over) ++py; 
+        if (!collision(px, py + 1, cur, rot)) ++py;
+        else lock_piece();
+}
 void Tetris::hard_drop() {
     if(paused || over) return;
     while(!collision(px, py + 1, cur, rot)) ++py;

@@ -13,8 +13,44 @@ main() {
         if (++Counter >= Speed) {
             Counter = 0;
             move_block(DOWN);
+            
             //SoundDrop();
         }
+        if(kbhit())                     //For the arrow keys
+		{  Key = getch();
+		   if(Key == 0)
+		   {	   ScanCode = getch();
+			   if(ScanCode == KEY_UP)
+					RotateBlock();
+			   else if(ScanCode == KEY_LEFT)
+					move_block(LEFT);
+			   else if(ScanCode == KEY_RIGHT)
+					move_block(RIGHT);
+			   else if(ScanCode == KEY_DOWN)
+			   {		Score++;         //increase score
+					PrintScore();
+					move_block(DOWN);
+			   }
+			   if(!Return)
+				   SoundDrop();
+			   Return = 0;
+		   }
+           else if(Key == KEY_ENTER || Key == KEY_SPACE)   //Rotating bricks
+				RotateBlock();
+		   else if(Key == 'P' || Key == 'p')      //For pause
+		   {	  MessageBox("  Paused");
+			  while(kbhit()) getch();         //clear the keyboard input
+			  for(int x=0; x<COLS; x++)
+				 for(int y=0; y<ROWS; y++)
+					PreviousScreenLayout[x][y] -= 1;    //Clear the present screen layout to refresh the whole screen
+			  update_screen();                //refresh screen
+		   }
+		   else if(Key == KEY_ESC)                                      //For quit
+		   {	  char ret = MessageBox("Are you sure, you want to Quit?", 563, 2);
+			  if(ret == 'y' || ret == 'Y' || ret == KEY_ENTER)
+			  {	  Quit = 1;
+				  break;
+			  }
    
     }
 }

@@ -1,6 +1,6 @@
-// test_usb_gamepad.cpp
-// A minimal program to open your USB Gamepad (Vendor 0x0079, Product 0x0011)
-// and print mapped Tetris actions to stdout for testing.
+// test_tetris_input.cpp
+// Opens your USB Gamepad (Vendor 0x0079, Product 0x0011 / "USB Gamepad")
+// and prints mapped Tetris actions to stdout for testing.
 
 #include <iostream>
 #include <fcntl.h>
@@ -21,49 +21,62 @@ int open_controller() {
         // get device name
         if (ioctl(fd, EVIOCGNAME(sizeof(name)), name) < 0)
             name[0] = '\0';
-
         // get vendor/product
         if (ioctl(fd, EVIOCGID, &id) < 0)
             memset(&id, 0, sizeof(id));
 
-        // match either exact name or VID/PID
+        // match exact name or vendor/product
         if (strcmp(name, "USB Gamepad") == 0 ||
-            (id.vendor == 0x0079 && id.product == 0x0011)) {
-            std::cout << "Opened controller: “" << name
-                      << "” at " << path
+            (id.vendor == 0x0079 && id.product == 0x0011))
+        {
+            std::cout << "Opened controller: \"" << name
+                      << "\" at " << path
                       << " (vid=0x" << std::hex << id.vendor
                       << " pid=0x" << id.product << std::dec << ")\n";
             return fd;
         }
-
         close(fd);
     }
     return -1;
 }
 
 // Map events to Tetris actions and print them.
-void handle_event(const struct input_event &ev) {
-    // D‑pad
+void handle_event(const input_event &ev) {
+    // D‑pad (ABS HAT)
     if (ev.type == EV_ABS) {
-        if (ev.code == ABS_HAT0X) {
-            if (ev.value < 0)      std::cout << "← Move Left\n";
-            else if (ev.value > 0) std::cout << "→ Move Right\n";
+        if (ev.code == 0) { // ABS_HAT0X
+            if (ev.value == 0)      std::cout << "← Move Left\n";
+            else if (ev.value == 255) std::cout << "→ Move Right\n";
         }
-        else if (ev.code == ABS_HAT0Y) {
-            if (ev.value > 0)      std::cout << "↓ Soft Drop\n";
+        else if (ev.code == 1) { // ABS_HAT0Y
+            if (ev.value == 255)    std::cout << "↓ Soft Drop (D‑pad)\n";
+            // up (value==0) is ignored
         }
     }
     // Buttons
     else if (ev.type == EV_KEY && ev.value == 1) {
         switch (ev.code) {
-            case BTN_TL:    // Left shoulder
-            case BTN_TR:    // Right shoulder
-            case BTN_X:     std::cout << "⟳ Rotate\n";           break;
-            case BTN_A:     std::cout << "↓ Soft Drop (A)\n";    break;
-            case BTN_B:     std::cout << "⤵ Hard Drop (B)\n";    break;
-            case BTN_Y:     std::cout << "⏸ Pause/Resume (Y)\n"; break;
-            case BTN_START: std::cout << "▶ Start / Restart\n";  break;
-            default:                                           break;
+            case 289: // BTN_A
+                std::cout << "↓ Soft Drop (A)\n";
+                break;
+            case 290: // BTN_B
+                std::cout << "⤵ Hard Drop (B)\n";
+                break;
+            case 288: // BTN_X
+                std::cout << "⟳ Rotate (X)\n";
+                break;
+            case 291: // BTN_Y
+                std::cout << "⏸ Pause/Resume (Y)\n";
+                break;
+            case 292: // BTN_TL
+            case 293: // BTN_TR
+                std::cout << "⟳ Rotate (Shoulder)\n";
+                break;
+            case 297: // BTN_START
+                std::cout << "▶ Start / Restart\n";
+                break;
+            default:
+                break;
         }
     }
 }
@@ -75,13 +88,14 @@ int main() {
         return 1;
     }
 
-    struct input_event ev;
+    input_event ev;
     while (true) {
         ssize_t n = read(fd, &ev, sizeof(ev));
         if (n == sizeof(ev)) {
             handle_event(ev);
         }
-        usleep(10 * 1000);  // 10 ms throttle
+        // throttle loop
+        usleep(10 * 1000);  // 10 ms
     }
 
     close(fd);

@@ -120,7 +120,7 @@ void Tetris::reset() {
     lines_cleared = 0;
     score_val = 0;
     over = 0;
-    field.fill(0);
+    for (int i = 0; i < 20; ++i) field[i].fill(0);
 
 }
 

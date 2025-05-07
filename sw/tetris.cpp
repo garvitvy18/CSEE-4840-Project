@@ -120,6 +120,8 @@ void Tetris::reset() {
     lines_cleared = 0;
     score_val = 0;
     over = 0;
+    field.fill(0);
+
 }
 
 //Render helper functions

@@ -193,6 +193,7 @@ static void show_start() {
 
 //Show game over screen
 static void show_game_over() {
+    clear_area(0, 0, 80, 60);
     draw_string(PF_LEFT + 2, PF_TOP + PF_HEIGHT / 2 - 3, "GAME OVER");
     draw_string(PF_LEFT - 2, PF_TOP + PF_HEIGHT / 2 + 3, "SPACE: RESTART");
 }

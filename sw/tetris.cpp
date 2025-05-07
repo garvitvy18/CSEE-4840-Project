@@ -23,7 +23,7 @@ static const std::array<Tetromino, 7> SHAPES = {
     make_piece({"##", "##", "..", ".."}, YELLOW), /* O */
     make_piece({".##", "##.", "...", "..."}, GREEN), /* S */
     make_piece({".#.", "###", "...", "..."}, CYAN), /* T */
-    make_piece({"##.", " .##", "...", "..."}, MAG) /* Z */
+    make_piece({"##.", ".##", "...", "..."}, MAG) /* Z */
 };
 
 //Rotate tetromino right

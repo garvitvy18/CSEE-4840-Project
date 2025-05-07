@@ -148,48 +148,73 @@ static State state = START;
 
 //Open USB Keyboard
 static int open_kbd() {
-    for (int i=0; i < 32; ++i){
-        char p[32]; sprintf(p, "/dev/input/event%d", i);
-        int fd = open(p, O_RDONLY | O_NONBLOCK);
+    struct input_id id;
+    char path[64], name[256];
+    for (int i = 0; i < 32; ++i) {
+        snprintf(path, sizeof(path), "/dev/input/event%d", i);
+        int fd = open(path, O_RDONLY | O_NONBLOCK);
         if (fd < 0) continue;
-        char name[64]; ioctl(fd, EVIOCGNAME(sizeof(name)), name);
-        if (strstr(name, "kbd") || strstr(name, "Keyboard")) return fd;
+
+        // get device name
+        if (ioctl(fd, EVIOCGNAME(sizeof(name)), name) < 0)
+            name[0] = '\0';
+        // get vendor/product
+        if (ioctl(fd, EVIOCGID, &id) < 0)
+            memset(&id, 0, sizeof(id));
+
+        // match on exact name or known VID/PID
+        if (strcmp(name, "USB Gamepad") == 0 ||
+            (id.vendor == 0x0079 && id.product == 0x0011))
+        {
+            printf("Using controller: %s (%s)\n", name, path);
+            return fd;
+        }
         close(fd);
     }
-    
     return -1;
 }
 
 //Read Keyboard input
 static void poll_input(Tetris& t, int fd) {
     struct input_event ev;
-    while (read(fd, &ev, sizeof(ev)) > 0)
-        if (ev.type == EV_KEY && ev.value == 1) {
-            switch(state) {
-            case START:
-                if (ev.code == KEY_SPACE) { 
-                    state = PLAY; 
-                    clear_area(0, 0, 80, 60);
-                }
-                break;
-            case PLAY:
-                switch(ev.code) {
-                    case KEY_LEFT: t.move_left(); break;
-                    case KEY_RIGHT: t.move_right(); break;
-                    case KEY_UP: t.rotate(); break;
-                    case KEY_DOWN: t.soft_drop(); break;
-                    case KEY_SPACE: t.hard_drop(); break;
-                    case KEY_P: t.toggle_pause();break;
-                } break;
-            case OVER:
-                if(ev.code == KEY_SPACE) { 
-                    t.reset();
-                    clear_area(0, 0, 80, 60);
-                    state = PLAY; 
-                }
-                break;
+    while (read(fd, &ev, sizeof(ev)) == sizeof(ev)) {
+        // D‑pad via ABS_HAT0X (code=0) / ABS_HAT0Y (code=1)
+        if (ev.type == EV_ABS) {
+            if (ev.code == 0) {            // left/right
+                if (ev.value == 0)         t.move_left();
+                else if (ev.value == 255)  t.move_right();
+            }
+            else if (ev.code == 1) {       // down
+                if (ev.value == 255)       t.soft_drop();
             }
         }
+        // Buttons via EV_KEY
+        else if (ev.type == EV_KEY && ev.value == 1) {
+            switch (ev.code) {
+                case 288:  // X
+                case 292:  // L
+                case 293:  // R
+                    t.rotate();            break;
+                case 289:  // A
+                    t.soft_drop();         break;
+                case 290:  // B
+                    t.hard_drop();         break;
+                case 291:  // Y
+                    t.toggle_pause();      break;
+                case 297:  // Start
+                    if (state == START || state == OVER) {
+                        if (state == OVER) {
+                            t.reset();
+                            clear_area(0,0,80,60);
+                        }
+                        state = PLAY;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 }
 
 //Show start screen

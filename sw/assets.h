@@ -21,8 +21,8 @@ constexpr int HUD_SCORE_ROW = 40;
 constexpr int HUD_LINES_ROW = HUD_SCORE_ROW + 10;
 
 //Coordinates for next box
-constexpr int NEXT_COL = PF_LEFT + PF_WIDTH + 2;
-constexpr int NEXT_ROW = PF_TOP;
+constexpr int NEXT_COL = PF_LEFT + PF_WIDTH + 3;
+constexpr int NEXT_ROW = PF_TOP + 1;
 
 //Palette Definition
 static constexpr uint32_t PALETTE24[16] = {

@@ -51,6 +51,34 @@ main() {
 			  {	  Quit = 1;
 				  break;
 			  }
+		    	  cleardevice();                              //Clear the message box
+			  while(kbhit()) getch();  		      //Clear the keyboard input
+			  for(int x=0; x<COLS; x++)
+				 for(int y=0; y<ROWS; y++)
+					PreviousScreenLayout[x][y] -= 1;    // Clear the present screen layout to refresh the whole screen
+			  update_screen();                //refresh screen
+			  DisplayScreen();               //show the main screen again
+			  display_next_shape();            //show next brick box
+		   }
+		   else if(Key == 's' || Key == 'S')        //For sound on/off
+		   {
+			  SoundOn = !SoundOn;
+
+		   }
+		   else if(Key=='a' || Key=='A')                      //For author
+		   {	 MessageBox("Author: Aguntuk Group",450);
+			 cleardevice();                               //Clear the message box
+			 while(kbhit()) getch();                      //Clear the keyboard input
+			 for(int x=0;x<COLS;x++)
+				for(int y=0;y<ROWS;y++)
+					PreviousScreenLayout[x][y] -=1;     //Clear the present screen layout to refresh the whole screen
+			 update_screen();                   //refresh screen
+			 DisplayScreen();                  //show the main screen again
+			 display_next_shape();               //show next brick box
+		   }
+		}
+		delay(6);      	      //For moving down the blocks slowly
+	}
    
     }
 }

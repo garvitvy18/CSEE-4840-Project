@@ -17,12 +17,12 @@ constexpr int PF_TOP   = (TILE_ROWS - PF_HEIGHT) / 4;
 
 //Coordinates for score / lines
 constexpr int HUD_COL = 0;
-constexpr int HUD_SCORE_ROW = 45;
+constexpr int HUD_SCORE_ROW = 40;
 constexpr int HUD_LINES_ROW = HUD_SCORE_ROW + 10;
 
 //Coordinates for next box
 constexpr int NEXT_COL = PF_LEFT + PF_WIDTH + 2;
-constexpr int NEXT_ROW = PF_TOP - 8;
+constexpr int NEXT_ROW = PF_TOP;
 
 //Palette Definition
 static constexpr uint32_t PALETTE24[16] = {

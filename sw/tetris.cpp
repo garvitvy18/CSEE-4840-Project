@@ -116,6 +116,12 @@ void Tetris::clear_lines() {
     }
 }
 
+void Tetris::reset() {
+    lines_cleared = 0;
+    score_val = 0;
+    over = 0;
+}
+
 //Render helper functions
 
 void Tetris::for_each_block(std::function<void(int, int, uint8_t)> cb) const

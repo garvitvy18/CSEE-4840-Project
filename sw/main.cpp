@@ -181,7 +181,10 @@ static void poll_input(Tetris& t, int fd) {
                     case KEY_P: t.toggle_pause();break;
                 } break;
             case OVER:
-                if(ev.code == KEY_SPACE) { state = START; }
+                if(ev.code == KEY_SPACE) { 
+                    t.reset();
+                    state = START; 
+                }
                 break;
             }
         }
@@ -201,7 +204,6 @@ static void show_game_over() {
     draw_string(10, 20, "GAME OVER");
     draw_string(10, 40, "SPACE:");
     draw_string(20, 50, "RESTART");
-    
 }
 
 //Main program loop

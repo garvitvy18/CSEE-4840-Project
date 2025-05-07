@@ -30,6 +30,7 @@ public:
     void soft_drop();
     void hard_drop();
     void toggle_pause();
+    void reset();
 
     /* expose for renderer */
     uint8_t playfield(int x, int y) const { return field[y][x]; }

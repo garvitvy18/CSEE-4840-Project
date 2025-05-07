@@ -32,7 +32,7 @@ public:
     void toggle_pause();
 
     /* expose for renderer */
-    uint8_t playfield(int x,int y) const { return field[y][x]; }
+    uint8_t playfield(int x, int y) const { return field[y][x]; }
     void for_each_block(std::function<void(int,int,uint8_t)> cb) const;
     void for_each_next (std::function<void(int,int,uint8_t)> cb) const;
     int score() const { return score_val; }

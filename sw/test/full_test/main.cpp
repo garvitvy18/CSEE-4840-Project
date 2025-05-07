@@ -1,116 +1,125 @@
 #include "assets.h"
-#include "Tetris.hpp"
 #include "font5x7.h"
+#include "Tetris.hpp"
 #include <fcntl.h>
 #include <linux/input.h>
 #include <sys/mman.h>
 #include <unistd.h>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 
-/* FPGA physical regions (lightweight bridge) */
-constexpr off_t PHY_TILEMAP = 0xff200000;
-constexpr off_t PHY_PALETTE = 0xff202000;
-constexpr off_t PHY_TILESET = 0xff204000;
-constexpr size_t SZ_TILEMAP = 8192, SZ_PALETTE = 64, SZ_TILESET = 16384;
+/* physical addresses (lw bridge) */
+constexpr off_t PHY_TM = 0xff200000;
+constexpr off_t PHY_PA = 0xff202000;
+constexpr off_t PHY_TS = 0xff204000;
+static volatile uint8_t *TM,*PA,*TS;
 
-/* tilemap grid is 80×60 */
-static volatile uint8_t *tilemap,*palette,*tileset;
-
+/* ────── mmap FPGA ────── */
 static void map_fpga()
 {
     int fd=open("/dev/mem",O_RDWR|O_SYNC);
-    if(fd<0){perror("mem");exit(1);}
-#define MAP(off,sz,ptr) \
-    ptr=(uint8_t*)mmap(nullptr,sz,PROT_READ|PROT_WRITE,MAP_SHARED,fd,off); \
-    if(ptr==MAP_FAILED){perror("mmap");exit(1);}
-    MAP(PHY_TILEMAP,SZ_TILEMAP,tilemap)
-    MAP(PHY_PALETTE,SZ_PALETTE,palette)
-    MAP(PHY_TILESET,SZ_TILESET,tileset)
-#undef MAP
+    if(fd<0){perror("mem");_exit(1);}
+#define MAP(base,sz,ptr) \
+    ptr=(uint8_t*)mmap(nullptr,sz,PROT_READ|PROT_WRITE,MAP_SHARED,fd,base);\
+    if(ptr==MAP_FAILED){perror("mmap");_exit(1);}
+    MAP(PHY_TM,8192 ,TM)
+    MAP(PHY_PA,64   ,PA)
+    MAP(PHY_TS,16384,TS)
     close(fd);
 }
 
+/* ────── palette + solid tiles ────── */
 static void load_assets()
 {
-    /* palette: R,G,B then dummy write byte to commit */
     for(int i=0;i<16;++i){
         uint32_t c=PALETTE24[i];
-        palette[i*4+0]=c&0xFF;
-        palette[i*4+1]=(c>>8)&0xFF;
-        palette[i*4+2]=(c>>16)&0xFF;
-        palette[i*4+3]=0;            /* commit */
+        PA[i*4+0]=c&0xFF;
+        PA[i*4+1]=(c>>8)&0xFF;
+        PA[i*4+2]=(c>>16)&0xFF;
+        PA[i*4+3]=0;
     }
     build_tileset();
-    memcpy((void*)tileset,TILESET,SZ_TILESET);
-    memcpy((void*)tilemap,BLANK_TILEMAP,SZ_TILEMAP);
+    memcpy((void*)TS,TILESET,16384);
+    memset((void*)TM,0,8192);
 }
 
-/* helpers for drawing --------------------------------------*/
-static inline void put_tile(int col,int row,uint8_t t)
-{ tilemap[row*128 + col] = t; }   // ← 128‑byte stride
+/* helpers: write tile */
+static inline void put(int col,int row,uint8_t t)
+{ TM[row*TM_STRIDE+col]=t; }
 
-static void draw_border()
+/* ────── draw primitives ────── */
+static void rect(int x0,int y0,int w,int h,uint8_t t)
 {
-    for(int x=0;x<=16;++x) put_tile(x,13,TILE_WALL), put_tile(x,34,TILE_WALL);
-    for(int y=13;y<=34;++y) put_tile(0,y,TILE_WALL),  put_tile(16,y,TILE_WALL);
+    for(int y=y0;y<y0+h;++y)
+        for(int x=x0;x<x0+w;++x) put(x,y,t);
 }
-
-static void draw_playfield(const Game& g)
+static void frame(int x0,int y0,int w,int h,uint8_t t)
 {
-    for(int x=0;x<COLS;++x)
-        for(int y=0;y<ROWS;++y)
-            put_tile(1+x,14+y,g.playfield(x,y));
+    for(int x=x0;x<x0+w;++x) put(x,y0,t), put(x,y0+h-1,t);
+    for(int y=y0;y<y0+h;++y) put(x0,y,t), put(x0+w-1,y,t);
 }
 
-static void draw_piece(const Game& g)
-{
-    g.for_each_block([](int x,int y,uint8_t c){
-        put_tile(1+x,14+y,c);
-    });
-}
-
-static void draw_next(const Game& g)
-{
-    /* 6×6 box border */
-    for(int x=18;x<=23;++x) put_tile(x,1,TILE_WALL),put_tile(x,6,TILE_WALL);
-    for(int y=1;y<=6;++y) put_tile(18,y,TILE_WALL),put_tile(23,y,TILE_WALL);
-
-    /* interior clear */
-    for(int x=19;x<=22;++x)for(int y=2;y<=5;++y) put_tile(x,y,TILE_EMPTY);
-
-    g.for_each_next([](int x,int y,uint8_t c){
-        put_tile(19+x,2+y,c);
-    });
-}
-
-/* render 5×7 font using TILE_WHITE blocks  */
+/* 5×7 font rendered with TILE_WHITE */
 static void draw_char(int col,int row,char ch)
 {
-    if(ch<' '||ch>'Z') return;
-    const uint8_t *bmp = FONT[ch-32];
-    for(int y=0;y<7;++y){
-        for(int x=0;x<5;++x){
-            bool on = bmp[y]&(1<<(4-x));
-            put_tile(col+x,row+y,on?TILE_WHITE:TILE_EMPTY);
-        }
-    }
+    if(ch<' '||ch>'_') return;
+    const uint8_t* bmp = FONT[ch-32];
+    for(int y=0;y<7;++y)
+        for(int x=0;x<5;++x)
+            if(bmp[y]&(1<<(4-x))) put(col+x,row+y,TILE_WHITE);
 }
 static void draw_string(int col,int row,const char*str)
 {
     for(int i=0;str[i];++i) draw_char(col+i*6,row,str[i]);
 }
+static void clear_area(int col,int row,int w,int h)
+{ rect(col,row,w,h,TILE_EMPTY); }
+
+/* ────── game renderer ────── */
+static void draw_borders()
+{
+    frame(PF_LEFT,PF_TOP,PF_WIDTH,PF_HEIGHT,TILE_WALL);
+    frame(NEXT_COL-1,NEXT_ROW-1,6,6,TILE_WALL);
+}
+static void draw_playfield(const Game& g)
+{
+    for(int y=0;y<ROWS;++y)
+        for(int x=0;x<COLS;++x)
+            put(PF_LEFT+1+x,PF_TOP+1+y,g.playfield(x,y));
+}
+static void draw_piece(const Game& g)
+{
+    g.for_each_block([](int x,int y,uint8_t c){
+        put(PF_LEFT+1+x,PF_TOP+1+y,c);
+    });
+}
+static void draw_next(const Game& g)
+{
+    /* clear interior */
+    rect(NEXT_COL,NEXT_ROW,4,4,TILE_EMPTY);
+    g.for_each_next([](int x,int y,uint8_t c){
+        put(NEXT_COL+x,NEXT_ROW+y,c);
+    });
+}
 static void draw_hud(const Game& g)
 {
-    draw_string(19,8,"SCORE");
-    draw_string(19,10,"LINES");
     char buf[8];
-    sprintf(buf,"%d",g.score());  draw_string(19,9,buf);
-    sprintf(buf,"%d",g.lines());  draw_string(19,11,buf);
+    sprintf(buf,"%d",g.score());
+    clear_area(HUD_COL,HUD_SCORE_ROW,24,7);
+    draw_string(HUD_COL,HUD_SCORE_ROW,"SCORE");
+    draw_string(HUD_COL,HUD_SCORE_ROW+2,buf);
+
+    sprintf(buf,"%d",g.lines());
+    clear_area(HUD_COL,HUD_LINES_ROW,24,7);
+    draw_string(HUD_COL,HUD_LINES_ROW,"LINES");
+    draw_string(HUD_COL,HUD_LINES_ROW+2,buf);
 }
 
-/* keyboard --------------------------------------------------*/
+/* ────── state machine ────── */
+enum State {START, PLAY, OVER};
+static State state = START;
+
+/* ────── keyboard (evdev) ────── */
 static int open_kbd()
 {
     for(int i=0;i<32;++i){
@@ -123,41 +132,70 @@ static int open_kbd()
     }
     return -1;
 }
-static void poll(Game& g,int fd)
+static void poll_input(Game& g,int fd)
 {
     struct input_event ev;
-    while(read(fd,&ev,sizeof(ev))>0){
+    while(read(fd,&ev,sizeof(ev))>0)
         if(ev.type==EV_KEY && ev.value==1){
-            switch(ev.code){
-            case KEY_LEFT:  g.move_left(); break;
-            case KEY_RIGHT: g.move_right();break;
-            case KEY_UP:    g.rotate();    break;
-            case KEY_DOWN:  g.soft_drop(); break;
-            case KEY_SPACE: g.hard_drop(); break;
-            case KEY_P:     g.toggle_pause(); break;
+            switch(state){
+            case START:
+                if(ev.code==KEY_SPACE){ state=PLAY; }
+                break;
+            case PLAY:
+                switch(ev.code){
+                    case KEY_LEFT: g.move_left(); break;
+                    case KEY_RIGHT:g.move_right();break;
+                    case KEY_UP:   g.rotate();    break;
+                    case KEY_DOWN: g.soft_drop(); break;
+                    case KEY_SPACE:g.hard_drop(); break;
+                    case KEY_P:    g.toggle_pause();break;
+                } break;
+            case OVER:
+                if(ev.code==KEY_SPACE) { state=START; }
+                break;
             }
         }
-    }
 }
 
-/* -----------------------------------------------------------*/
+/* ────── screens ────── */
+static void show_start()
+{
+    memset((void*)TM,0,8192);
+    draw_string(20,20,"TETRIS  FPGA");
+    draw_string(12,30,"PRESS SPACE TO START");
+}
+static void show_game_over()
+{
+    draw_string(PF_LEFT+2,PF_TOP+PF_HEIGHT/2-3,"GAME OVER");
+    draw_string(PF_LEFT-2,PF_TOP+PF_HEIGHT/2+3,"SPACE: RESTART");
+}
+
+/* ────── main loop ────── */
 int main()
 {
     map_fpga();
     load_assets();
-    draw_border();
+    int kbd=open_kbd(); if(kbd<0){perror("kbd");return 1;}
 
-    Game g;
-    int kbd=open_kbd();
-    if(kbd<0){fprintf(stderr,"kbd not found\n");return 1;}
+    Game game;
+    show_start();
 
     while(true){
-        poll(g,kbd);
-        g.step();
-        draw_playfield(g);
-        draw_piece(g);
-        draw_next(g);
-        draw_hud(g);
-        usleep(16666);   /* ~60 fps */
+        poll_input(game,kbd);
+
+        if(state==PLAY){
+            game.step();
+            draw_borders();
+            draw_playfield(game);
+            draw_piece(game);
+            draw_next(game);
+            draw_hud(game);
+            if(game.game_over()){ state=OVER; show_game_over(); }
+        }else if(state==START){
+            /* nothing */
+        }else if(state==OVER){
+            /* waiting for key */
+        }
+        usleep(16666);
     }
 }

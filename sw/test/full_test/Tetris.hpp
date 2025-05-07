@@ -4,29 +4,26 @@
 #include <cstdint>
 #include <functional>
 
-/* grid: 15 × 20 interior cells */
 constexpr int COLS = 15;
 constexpr int ROWS = 20;
 
-/* Tile indices for blocks (match palette / tileset) */
+/* tile colours match assets.h */
 enum Cell : uint8_t {
     EMPTY = 0,
-    RED   = 2,  /* I */
-    GREEN = 3,  /* S */
-    BLUE  = 4,  /* J */
-    YELLOW= 5,  /* O */
-    CYAN  = 6,  /* Z */
-    MAG   = 7   /* T */
+    RED   = 2,
+    GREEN = 3,
+    BLUE  = 4,
+    YELLOW= 5,
+    CYAN  = 6,
+    MAG   = 7
 };
 
-struct Piece {
-    std::array<std::array<uint8_t,4>,4> mask;  /* 4×4 bitmap of tile index */
-};
+struct Piece { std::array<std::array<uint8_t,4>,4> mask{}; };
 
 class Game {
 public:
     Game();
-    void step();              /* gravity / timing tick   */
+    void step();              /* gravity tick */
     void move_left();
     void move_right();
     void rotate();
@@ -34,23 +31,20 @@ public:
     void hard_drop();
     void toggle_pause();
 
-    /* provide data to renderer */
+    /* expose for renderer */
     uint8_t playfield(int x,int y) const { return field[y][x]; }
     void for_each_block(std::function<void(int,int,uint8_t)> cb) const;
     void for_each_next (std::function<void(int,int,uint8_t)> cb) const;
-    int  score() const { return score_val; }
-    int  lines() const { return lines_cleared; }
+    int score() const { return score_val; }
+    int lines() const { return lines_cleared; }
+    bool game_over() const { return over; }
 
 private:
     std::array<std::array<uint8_t,COLS>,ROWS> field{};
-
-    Piece bag[7];
-    int   bag_idx = 0;
     Piece cur, nxt;
     int   px = 5, py = 0, rot = 0;
     int   tick = 0;
-    bool  paused=false;
-
+    bool  paused=false, over=false;
     int   score_val = 0;
     int   lines_cleared = 0;
 

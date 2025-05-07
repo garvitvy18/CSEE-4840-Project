@@ -11,6 +11,17 @@ main() {
     int Counter = 0;
     initgraph(&gd, &gm,"c:\\tc\\bgi");      //initialize graphics mode
     randomize();                            //Randomize block's shapes & color
+	update_screen();                          //clear screen
+	InitPalette();                          //for setting color pallete
+	InitMatrix();                           //Initialize Matrix
+	GetImages();                            //Saving the images
+	start_screen();                          //for start screen
+	update_screen();                          //clear screen
+	assign_shape_and_color(shape(), color());      //for the falling block
+	NextShape=shape();
+	NextColor=color();                                         	display_start_screen();                        //Show main screen
+	display_next_shape();                     //show next brick
+	move_block(LEFT);                        //keep the block on center & check game o
 //Start the game and keep it running continuously
     while (!Quit && !GameOver) {
         if (++Counter >= Speed) {

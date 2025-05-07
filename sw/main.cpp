@@ -177,7 +177,7 @@ int main()
     load_assets();
     int kbd=open_kbd(); if(kbd<0){perror("kbd");return 1;}
 
-    Game game;
+    Tetris game;
     show_start();
 
     while(true){

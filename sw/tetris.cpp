@@ -5,16 +5,17 @@
 int block_matrix[4][4] // current falling tetromino
 int playfield[COLS][ROWS] // fixed blocks on the board
 main() {
+    int gd=DETECT,gm;
     int Return = 0;
     char Key, ScanCode;
     int Counter = 0;
+    initgraph(&gd, &gm,"c:\\tc\\bgi");      //initialize graphics mode
+    randomize();                            //Randomize block's shapes & color
 //Start the game and keep it running continuously
     while (!Quit && !GameOver) {
         if (++Counter >= Speed) {
             Counter = 0;
             move_block(DOWN);
-            
-            //SoundDrop();
         }
         if(kbhit())                     //For the arrow keys
 		{  Key = getch();
@@ -31,14 +32,12 @@ main() {
 					PrintScore();
 					move_block(DOWN);
 			   }
-			   if(!Return)
-				   SoundDrop();
-			   Return = 0;
+			  
 		   }
            else if(Key == KEY_ENTER || Key == KEY_SPACE)   //Rotating bricks
 				RotateBlock();
 		   else if(Key == 'P' || Key == 'p')      //For pause
-		   {	  MessageBox("  Paused");
+		   {	 
 			  while(kbhit()) getch();         //clear the keyboard input
 			  for(int x=0; x<COLS; x++)
 				 for(int y=0; y<ROWS; y++)
@@ -46,12 +45,12 @@ main() {
 			  update_screen();                //refresh screen
 		   }
 		   else if(Key == KEY_ESC)                                      //For quit
-		   {	  char ret = MessageBox("Are you sure, you want to Quit?", 563, 2);
+		   {	  
 			  if(ret == 'y' || ret == 'Y' || ret == KEY_ENTER)
 			  {	  Quit = 1;
 				  break;
 			  }
-		    	  cleardevice();                              //Clear the message box
+		    	 
 			  while(kbhit()) getch();  		      //Clear the keyboard input
 			  for(int x=0; x<COLS; x++)
 				 for(int y=0; y<ROWS; y++)
@@ -60,22 +59,8 @@ main() {
 			  display_start_screen();               //show the main screen again
 			  display_next_shape();            //show next brick box
 		   }
-		   else if(Key == 's' || Key == 'S')        //For sound on/off
-		   {
-			  SoundOn = !SoundOn;
-
-		   }
-		   else if(Key=='a' || Key=='A')                      //For author
-		   {	 MessageBox("Author: Aguntuk Group",450);
-			 cleardevice();                               //Clear the message box
-			 while(kbhit()) getch();                      //Clear the keyboard input
-			 for(int x=0;x<COLS;x++)
-				for(int y=0;y<ROWS;y++)
-					PreviousScreenLayout[x][y] -=1;     //Clear the present screen layout to refresh the whole screen
-			 update_screen();                   //refresh screen
-			 display_start_screen();                  //show the main screen again
-			 display_next_shape();               //show next brick box
-		   }
+	
+		  
 		}
 		delay(6);      	      //For moving down the blocks slowly
 	}

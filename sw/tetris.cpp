@@ -57,7 +57,7 @@ main() {
 				 for(int y=0; y<ROWS; y++)
 					PreviousScreenLayout[x][y] -= 1;    // Clear the present screen layout to refresh the whole screen
 			  update_screen();                //refresh screen
-			  DisplayScreen();               //show the main screen again
+			  display_start_screen();               //show the main screen again
 			  display_next_shape();            //show next brick box
 		   }
 		   else if(Key == 's' || Key == 'S')        //For sound on/off
@@ -73,14 +73,18 @@ main() {
 				for(int y=0;y<ROWS;y++)
 					PreviousScreenLayout[x][y] -=1;     //Clear the present screen layout to refresh the whole screen
 			 update_screen();                   //refresh screen
-			 DisplayScreen();                  //show the main screen again
+			 display_start_screen();                  //show the main screen again
 			 display_next_shape();               //show next brick box
 		   }
 		}
 		delay(6);      	      //For moving down the blocks slowly
 	}
-   
-    }
+   if(GameOver)                  //For game over option
+	{      	display_block(6,0);    //For display the top most brick
+		display_game_over();       //For display game over message box
+	}
+	restorecrtmode();    //For closing graphicg mode
+	return 0;
 }
 //for drawing tetrominos
 void draw_tetromino(int x, int y, char color) {

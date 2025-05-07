@@ -11,8 +11,9 @@ constexpr int TM_STRIDE = 128;        /* bytes per tile‑row  */
 constexpr int PF_WIDTH  = 17;
 constexpr int PF_HEIGHT = 22;         /* top & bottom walls  */
 
-constexpr int PF_LEFT  = (TILE_COLS - PF_WIDTH ) / 2;  /* centred */
-constexpr int PF_TOP   = (TILE_ROWS - PF_HEIGHT) / 2;
+/* centred before ───────── PF_LEFT/PF_TOP */
+constexpr int PF_LEFT  = 4;   /* was (TILE_COLS-PF_WIDTH)/2  = 31 */
+constexpr int PF_TOP   = 6;   /* was 19 */
 
 /* HUD offsets (SCORE/LINES) – bottom‑right corner area      */
 constexpr int HUD_COL = PF_LEFT + PF_WIDTH + 2;      /* two tiles gap */

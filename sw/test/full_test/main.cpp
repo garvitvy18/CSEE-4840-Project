@@ -136,25 +136,27 @@ static void poll_input(Game& g,int fd)
 {
     struct input_event ev;
     while(read(fd,&ev,sizeof(ev))>0)
-        if(ev.type==EV_KEY && ev.value==1){
-            switch(state){
-            case START:
-                if(ev.code==KEY_SPACE){ state=PLAY; }
-                break;
-            case PLAY:
-                switch(ev.code){
-                    case KEY_LEFT: g.move_left(); break;
-                    case KEY_RIGHT:g.move_right();break;
-                    case KEY_UP:   g.rotate();    break;
-                    case KEY_DOWN: g.soft_drop(); break;
-                    case KEY_SPACE:g.hard_drop(); break;
-                    case KEY_P:    g.toggle_pause();break;
-                } break;
-            case OVER:
-                if(ev.code==KEY_SPACE) { state=START; }
-                break;
+    if(ev.type==EV_KEY && ev.value==1){
+        switch(state){
+        case START:
+            if(ev.code==KEY_SPACE){
+                state=PLAY;
+                memset((void*)TM,0,8192);   /* ← clear start screen */
+                draw_borders();              /* redraw walls once   */
             }
+            break;
+        case PLAY:
+            /* ...input for game... */
+            break;
+        case OVER:
+            if(ev.code==KEY_SPACE){
+                state=START;
+                memset((void*)TM,0,8192);   /* ← clear game‑over   */
+                show_start();
+            }
+            break;
         }
+    }
 }
 
 /* ────── screens ────── */
@@ -190,7 +192,11 @@ int main()
             draw_piece(game);
             draw_next(game);
             draw_hud(game);
-            if(game.game_over()){ state=OVER; show_game_over(); }
+            if(game.game_over()){
+                state = OVER;
+                memset((void*)TM,0,8192);       /* ← erase playfield   */
+                show_game_over();
+            }
         }else if(state==START){
             /* nothing */
         }else if(state==OVER){

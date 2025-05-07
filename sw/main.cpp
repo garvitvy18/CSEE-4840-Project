@@ -126,12 +126,12 @@ static void draw_next(const Tetris& t) {
 static void draw_hud(const Tetris& t) {
     char buf[8];
     sprintf(buf, "%d", t.score());
-    clear_area(HUD_COL, HUD_SCORE_ROW, 24, 7);
+    clear_area(HUD_COL, HUD_SCORE_ROW, 80, 10);
     draw_string(HUD_COL, HUD_SCORE_ROW, "SCORE");
     draw_string(HUD_COL + 40, HUD_SCORE_ROW, buf);
 
     sprintf(buf, "%d", t.lines());
-    clear_area(HUD_COL, HUD_LINES_ROW, 24, 7);
+    clear_area(HUD_COL, HUD_LINES_ROW, 80, 10);
     draw_string(HUD_COL, HUD_LINES_ROW, "LINES");
     draw_string(HUD_COL + 40, HUD_LINES_ROW, buf);
 }

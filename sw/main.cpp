@@ -187,15 +187,16 @@ static void poll_input(Tetris& t, int fd) {
 //Show start screen
 static void show_start() {
     memset((void*)TM, 0, 8192);
-    draw_string(20, 20, "TETRIS FPGA");
-    draw_string(12, 30, "PRESS SPACE TO START");
+    draw_string(10, 20, "TETRIS FPGA");
+    draw_string(10, 40, "PRESS SPACE");
+    draw_string(10, 50, "TO START");
 }
 
 //Show game over screen
 static void show_game_over() {
     clear_area(0, 0, 80, 60);
-    draw_string(PF_LEFT + 2, PF_TOP + PF_HEIGHT / 2 - 3, "GAME OVER");
-    draw_string(PF_LEFT - 2, PF_TOP + PF_HEIGHT / 2 + 3, "SPACE: RESTART");
+    draw_string(10, 20, "GAME OVER");
+    draw_string(10, 40, "SPACE: RESTART");
 }
 
 //Main program loop

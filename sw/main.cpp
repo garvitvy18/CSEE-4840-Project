@@ -38,8 +38,8 @@ static void load_assets() {
     for (int i = 0; i < 16; ++i){
         uint32_t color = PALETTE24[i];
         PA[i*4+0] = color & 0xFF;
-        PA[i*4+1] = (color > >8) & 0xFF;
-        PA[i*4+2] = (color > 16) & 0xFF;
+        PA[i*4+1] = (color >> 8) & 0xFF;
+        PA[i*4+2] = (color >> 16) & 0xFF;
         PA[i*4+3] = 0;
     }
     build_tileset();
@@ -207,7 +207,7 @@ int main() {
     show_start();
 
     while(true) {
-        poll_input(tetris,k bd);
+        poll_input(tetris, kbd);
         if (state == PLAY) {
             tetris.step();
             draw_borders();

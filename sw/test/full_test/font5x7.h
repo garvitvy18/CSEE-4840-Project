@@ -2,8 +2,10 @@
 #define FONT5X7_H
 #include <cstdint>
 
-/* 5×7 ASCII capital‑letters & digits (32‑90).  Each row bit0 = left. */
-static constexpr uint8_t FONT[59][7] = {
+/* 5×7 bitmap font for ASCII 32‑90.  First dimension left un‑specified
+   so the compiler chooses the correct size (prevents “too many
+   initialisers” error).  Bit‑0 of each byte = leftmost pixel.          */
+static constexpr uint8_t FONT[][7] = {
 /* ' ' */ {0,0,0,0,0,0,0},
 /* '!' */ {4,4,4,4,0,4,0},
 /* '"' */ {10,10,0,0,0,0,0},
@@ -67,7 +69,7 @@ static constexpr uint8_t FONT[59][7] = {
 /* '\' */ {16,8,4,2,1,0,0},
 /* ']' */ {14,2,2,2,2,14,0},
 /* '^' */ {4,10,17,0,0,0,0},
-/* '_' */ {0,0,0,0,0,0,31},
+/* '_' */ {0,0,0,0,0,0,31}
 };
 
 #endif

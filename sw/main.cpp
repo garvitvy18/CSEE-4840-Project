@@ -156,6 +156,7 @@ static int open_kbd() {
         if (strstr(name, "kbd") || strstr(name, "Keyboard")) return fd;
         close(fd);
     }
+    
     return -1;
 }
 

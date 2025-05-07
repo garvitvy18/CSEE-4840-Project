@@ -1,553 +1,129 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <tetris.hpp>
+#include "tetris.hpp"
+#include <algorithm>
+#include <array>
+#include <random>
 
-int block_matrix[4][4] // current falling tetromino
-int playfield[COLS][ROWS] // fixed blocks on the board
-main() {
-    int gd=DETECT,gm;
-    int Return = 0;
-    char Key, ScanCode;
-    int Counter = 0;
-    initgraph(&gd, &gm,"c:\\tc\\bgi");      //initialize graphics mode
-    randomize();                            //Randomize block's shapes & color
-	update_screen();                          //clear screen
-	InitPalette();                          //for setting color pallete
-	InitMatrix();                           //Initialize Matrix
-	GetImages();                            //Saving the images
-	start_screen();                          //for start screen
-	update_screen();                          //clear screen
-	assign_shape_and_color(shape(), color());      //for the falling block
-	NextShape=shape();
-	NextColor=color();                                         	display_start_screen();                        //Show main screen
-	display_next_shape();                     //show next brick
-	move_block(LEFT);                        //keep the block on center & check game o
-//Start the game and keep it running continuously
-    while (!Quit && !GameOver) {
-        if (++Counter >= Speed) {
-            Counter = 0;
-            move_block(DOWN);
-        }
-        if(kbhit())                     //For the arrow keys
-		{  Key = getch();
-		   if(Key == 0)
-		   {	   ScanCode = getch();
-			   if(ScanCode == KEY_UP)
-					RotateBlock();
-			   else if(ScanCode == KEY_LEFT)
-					move_block(LEFT);
-			   else if(ScanCode == KEY_RIGHT)
-					move_block(RIGHT);
-			   else if(ScanCode == KEY_DOWN)
-			   {		Score++;         //increase score
-					PrintScore();
-					move_block(DOWN);
-			   }
-			  
-		   }
-           else if(Key == KEY_ENTER || Key == KEY_SPACE)   //Rotating bricks
-				RotateBlock();
-		   else if(Key == 'P' || Key == 'p')      //For pause
-		   {	 
-			  while(kbhit()) getch();         //clear the keyboard input
-			  for(int x=0; x<COLS; x++)
-				 for(int y=0; y<ROWS; y++)
-					PreviousScreenLayout[x][y] -= 1;    //Clear the present screen layout to refresh the whole screen
-			  update_screen();                //refresh screen
-		   }
-		   else if(Key == KEY_ESC)                                      //For quit
-		   {	  
-			  if(ret == 'y' || ret == 'Y' || ret == KEY_ENTER)
-			  {	  Quit = 1;
-				  break;
-			  }
-		    	 
-			  while(kbhit()) getch();  		      //Clear the keyboard input
-			  for(int x=0; x<COLS; x++)
-				 for(int y=0; y<ROWS; y++)
-					PreviousScreenLayout[x][y] -= 1;    // Clear the present screen layout to refresh the whole screen
-			  update_screen();                //refresh screen
-			  display_start_screen();               //show the main screen again
-			  display_next_shape();            //show next brick box
-		   }
-	
-		  
-		}
-		delay(6);      	      //For moving down the blocks slowly
-	}
-   if(GameOver)                  //For game over option
-	{      	display_block(6,0);    //For display the top most brick
-		display_game_over();       //For display game over message box
-	}
-	restorecrtmode();    //For closing graphicg mode
-	return 0;
-}
-//for drawing tetrominos
-void draw_tetromino(int x, int y, char color) {
-   //Convert cell coordinates to pixel coordinates
-    int pixel_x = LEFT + x * 21;
-    int pixel_y = TOP  + y * 21;
-   
-
-}
-
-//initialize the playfield
-void playfield_init() {
-    //Initialize the playfield based on the total columns and rows
-    for(int i=0;i<COLS;i++){
-        for(int j=0;j<ROWS;j++){
-            playfield[i][j]=0;
-        }
+static Tetromino make_piece(std::initializer_list<const char*> rows, uint8_t tile)
+{
+    Tetromino t{};
+    int row = 0;
+    for(auto line:rows){
+        for(int col = 0; col < 4 && line[col]; ++col)
+            if(line[col] == '#') t.mask[row][col] = tile;
+        ++row;
     }
-    
+    return t;
 }
 
-//gives shape and color to the current falling tetromino
-void assign_shape_and_color(int shape, int color) {
-     switch(shape){
-        case SHAPE_I:
-            for (int i = 0; i < 4; ++i) {
-                for (int j = 0; j < 4; ++j) {
-                    block_matrix[j][i] = shape_I[i][j] ? color : 0;
-                }
+static const std::array<Tetromino,7> SHAPES={
+    make_piece({"####","....","....","...."},RED),     /* I */
+    make_piece({"#..","###","...","..."   },BLUE),     /* J */
+    make_piece({"..#","###","...","..."   },MAG),      /* L */
+    make_piece({"##","##","..",".."       },YELLOW),   /* O */
+    make_piece({".##","##.","...","..."   },GREEN),    /* S */
+    make_piece({".#.","###","...","..."   },CYAN),     /* T */
+    make_piece({"##."," .##","...","..."  },MAG)       /* Z*/
+};
+
+static Tetromino rot_right(const Tetromino& t){
+    Tetromino r{};
+    for(int y = 0; y < 4; ++y)
+        for(int x=0;x<4;++x)
+            r.mask[x][3-y]=t.mask[y][x];
+    return r;
+}
+Tetromino Tetris::rotate_piece(const Tetromino& t,int r) const
+{
+    Tetromino q=t;
+    for(int i=0;i<r;++i) q=rot_right(q);
+    return q;
+}
+
+static Tetromino rnd_piece(){
+    static std::mt19937 gen{std::random_device{}()};
+    static std::uniform_int_distribution<int>d(0,6);
+    return SHAPES[d(gen)];
+}
+
+Tetris::Tetris(){ cur=rnd_piece(); nxt=rnd_piece(); spawn(); }
+
+void Tetris::spawn()
+{
+    px=5; py=0; rot=0; cur=nxt; nxt=rnd_piece();
+    if(collision(px,py,cur,rot)){ over=true; }
+}
+
+bool Tetris::collision(int nx,int ny,const Tetromino& pc,int r) const
+{
+    Tetromino p=rotate_piece(pc,r);
+    for(int y=0;y<4;++y)
+        for(int x=0;x<4;++x)
+            if(p.mask[y][x]){
+                int gx=nx+x, gy=ny+y;
+                if(gx<0||gx>=COLS||gy>=ROWS) return true;
+                if(gy>=0 && field[gy][gx]) return true;
             }
-            break;
-        case SHAPE_O:
-            for (int i = 0; i < 4; ++i) {
-                for (int j = 0; j < 4; ++j) {
-                    block_matrix[j][i] = shape_O[i][j] ? color : 0;
-                }
-            }
-            break;
-         case SHAPE_T:
-            for (int i = 0; i < 4; ++i) {
-                for (int j = 0; j < 4; ++j) {
-                    block_matrix[j][i] = shape_T[i][j] ? color : 0;
-                }
-            }
-            break;
-        case SHAPE_S:
-            for (int i = 0; i < 4; ++i) {
-                for (int j = 0; j < 4; ++j) {
-                    block_matrix[j][i] = shape_S[i][j] ? color : 0;
-                }
-            }
-            break;
-         case SHAPE_Z:
-            for (int i = 0; i < 4; ++i) {
-                for (int j = 0; j < 4; ++j) {
-                    block_matrix[j][i] = shape_Z[i][j] ? color : 0;
-                }
-            }
-            break;
-        case SHAPE_J:
-            for (int i = 0; i < 4; ++i) {
-                for (int j = 0; j < 4; ++j) {
-                    block_matrix[j][i] = shape_J[i][j] ? color : 0;
-                }
-            }
-            break;
-        case SHAPE_L:
-            for (int i = 0; i < 4; ++i) {
-                for (int j = 0; j < 4; ++j) {
-                    block_matrix[j][i] = shape_L[i][j] ? color : 0;
-                }
-            }
-            break;
-        default:
-            // Unknown shape: clear out
-            for (int i = 0; i < 4; ++i)
-                for (int j = 0; j < 4; ++j)
-                    block_matrix[j][i] = 0;
-            break;
-        
+    return false;
+}
+
+/* input ops */
+void Tetris::move_left (){ if(!paused&&!over&&!collision(px-1,py,cur,rot))--px; }
+void Tetris::move_right(){ if(!paused&&!over&&!collision(px+1,py,cur,rot))++px; }
+void Tetris::rotate()    { if(!paused&&!over&&!collision(px,py,cur,(rot+1)%4))rot=(rot+1)%4; }
+void Tetris::soft_drop() { if(!paused&&!over) ++py; }
+void Tetris::hard_drop()
+{
+    if(paused||over)return;
+    while(!collision(px,py+1,cur,rot)) ++py;
+    lock_piece();
+}
+void Tetris::toggle_pause(){ if(!over) paused=!paused; }
+
+/* gravity */
+void Tetris::step()
+{
+    if(paused||over) return;
+    if(++tick%30==0){
+        if(!collision(px,py+1,cur,rot)) ++py;
+        else lock_piece();
     }
-    current_shape=shape;
-    current_color=color;
-
-
 }
 
-//returns 1 when tetromino collides with edge of screen or another tetromino
-int detect_collision(int dir) {
-    //For computing the new position based on the current position
-    int new_x=current_x;
-    int new_y=current_y;
+void Tetris::lock_piece()
+{
+    Tetromino p=rotate_piece(cur,rot);
+    for(int y=0;y<4;++y)
+        for(int x=0;x<4;++x)
+            if(p.mask[y][x])
+                field[py+y][px+x]=p.mask[y][x];
+    clear_lines();
+    spawn();
+}
 
-    // Adjust for the attempted move
-    if (dir == LEFT)       new_x--;
-    else if (dir == RIGHT) new_x++;
-    else if (dir == DOWN)  new_y++;
- // For each cell in the 4×4 block matrix
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            // Skip empty cells
-            if (block_matrix[i][j] == 0) 
-                continue;
-
-            // Compute the board coordinates of this cell
-            int bx = new_x + i;
-            int by = new_y + j;
-
-            // Collision if out of horizontal bounds
-            if (bx < 0 || bx >= COLS)
-                return 1;
-             // Collision if below the bottom
-            if (by >= ROWS)
-                return 1;
-
-            // Collision if landing on an occupied cell
-            if (playfield[bx][by] != 0)
-                return 1;
+void Tetris::clear_lines()
+{
+    for(int y=0;y<ROWS;++y){
+        bool full=true;
+        for(int x=0;x<COLS;++x) if(!field[y][x]){full=false;break;}
+        if(full){
+            for(int yy=y;yy>0;--yy) field[yy]=field[yy-1];
+            field[0].fill(0);
+            ++lines_cleared; score_val+=100;
         }
     }
-
-    // No collision detected
-    return 0;
-
 }
 
-//moves the current tetromino in the specified direction, returns 0 if tetromino moved else returns 1
-int move_block(int dir) {
-    // First check for collision by calling the function 
-    if (detect_collision(dir)) {
-        // If we hit something when moving down, lock the piece and spawn next
-        if (dir == DOWN) {
-            get_next_block();
-        }
-        return 1;  // collision occurred
-        } else {
-        // No collision: update the current position
-        if (dir == LEFT) {
-            current_x--;
-        } 
-        else if (dir == RIGHT) {
-            current_x++;
-        } 
-        else if (dir == DOWN) {
-            current_y++;
-        }
-        return 0;  // moved successfully
-    }
-
+/* expose to renderer */
+void Tetris::for_each_block(std::function<void(int,int,uint8_t)> cb) const
+{
+    Tetromino p=rotate_piece(cur,rot);
+    for(int y=0;y<4;++y)
+        for(int x=0;x<4;++x)
+            if(p.mask[y][x]) cb(px+x,py+y,p.mask[y][x]);
 }
-
-//display the tetromino on screen
-void display_block(int x, int y, int shape, int color, int rotation) {
-    current_x=x;
-    current_y=y;
-    current_shape=shape;
-    current_color=color;
-
-    assign_shape_and_color(shape,color);
-
-      // Apply rotation
-    int times = 0;
-    switch (rotation) {
-        case NINETY:     times = 1; break;
-        case ONE_EIGHTY: times = 2; break;
-        case TWO_SEVENTY:times = 3; break;
-        case ZERO:
-        default:         times = 0; break;
-    }
-    for (int r = 0; r < times; ++r) {
-        // rotate 90° CW
-        RotateBlock(true);
-    }
-
-    //Display the blocks
-      //Draw each occupied cell
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            if (block_matrix[i][j] != 0) {
-                draw_tetromino(x + i, y + j, block_matrix[i][j]);
-            }
-        }
-    }
-
-}
-
-//display the next tetromino box
-void display_next_shape() {
-        // Build a temporary 4×4 color matrix for the next piece
-    int temp[4][4] = { 0 };
-
-    switch (next_shape) {
-        case SHAPE_I:
-            for (int i = 0; i < 4; ++i) {
-                for (int j = 0; j < 4; ++j) {
-                    temp[i][j] = shape_I[i][j] ? next_color : 0;
-                }
-            }
-            break;
-        case SHAPE_O:
-            for (int i = 0; i < 4; ++i) {
-                for (int j = 0; j < 4; ++j) {
-                    temp[i][j] = shape_O[i][j] ? next_color : 0;
-                }
-            }
-            break;
-          case SHAPE_T:
-            for (int i = 0; i < 4; ++i) {
-                for (int j = 0; j < 4; ++j) {
-                    temp[i][j] = shape_T[i][j] ? next_color : 0;
-                }
-            }
-            break;
-        case SHAPE_S:
-            for (int i = 0; i < 4; ++i) {
-                for (int j = 0; j < 4; ++j) {
-                    temp[i][j] = shape_S[i][j] ? next_color : 0;
-                }
-            }
-            break;
-        case SHAPE_Z:
-            for (int i = 0; i < 4; ++i) {
-                for (int j = 0; j < 4; ++j) {
-                    temp[i][j] = shape_Z[i][j] ? next_color : 0;
-                }
-            }
-            break;
-         case SHAPE_J:
-            for (int i = 0; i < 4; ++i) {
-                for (int j = 0; j < 4; ++j) {
-                    temp[i][j] = shape_J[i][j] ? next_color : 0;
-                }
-            }
-            break;
-        case SHAPE_L:
-            for (int i = 0; i < 4; ++i) {
-                for (int j = 0; j < 4; ++j) {
-                    temp[i][j] = shape_L[i][j] ? next_color : 0;
-                }
-            }
-            break;
-        default:
-            // If unknown shape, leave temp all zero
-            break;
-    }
-     // Draw the preview at a fixed offset (in grid cells)
-    const int PREVIEW_X = COLS + 2;
-    const int PREVIEW_Y = 0;
-
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            if (temp[i][j] != 0) {
-                draw_tetromino(PREVIEW_X + j,
-                               PREVIEW_Y + i,
-                               temp[i][j]);
-            }
-        }
-    }
-
-}
-
-//update background
-void update_background() {
- // Mark every cell dirty so that draw_tetromino always redraws it
-    for (int x = 0; x < COLS; ++x) {
-        for (int y = 0; y < ROWS; ++y) {
-            PreviousScreenLayout[x][y] = BLANK - 1;
-        }
-    }
-
-    // Redraw the entire playfield
-    for (int x = 0; x < COLS; ++x) {
-        for (int y = 0; y < ROWS; ++y) {
-            if (playfield[x][y] != 0) {
-                // occupied → draw that block color
-                draw_tetromino(x, y, playfield[x][y]);
-            } else {
-                // empty → clear it
-                draw_tetromino(x, y, BLANK);
-            }
-        }
-    }
-
-}
-
-//spawn next tetromino on screen
-void get_next_block() {
-
-    // Lock the current piece into the playfield
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            if (block_matrix[i][j] != 0) {
-                playfield[current_x + i][current_y + j] = block_matrix[i][j];
-            }
-        }
-    }
-     // Clear any completed lines
-    check_clear();
-
-     // Advance the next piece into the current slot
-    current_shape = next_shape;
-    current_color = next_color;
-
-    // Generate a brand-new preview piece
-    next_shape = get_random_shape();
-    next_color = get_random_color();
-
-    // Reset position for the new current piece
-    current_x = start_x;
-    current_y = 0;
-
-    // Update the preview display
-    display_next_shape();
-
-    // If the new piece immediately collides, it's game over
-    if (detect_collision(DOWN)) {
-        game_over = 1;
-    }
-}
-
-//rotate current tetromino
-void RotateBlock(bool dir) {
-    // Backup the current 4×4 block matrix
-    int temp[4][4];
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            temp[i][j] = block_matrix[i][j];
-        }
-    }
-
-    // Apply rotation: CW if dir==true, else CCW via three CWs
-    if (dir) {
-        RotateBlock();           // calls the no‐arg, DOS‐style RotateBlock (90° CW)
-    } else {
-        RotateBlock();
-        RotateBlock();
-        RotateBlock();           // net effect: 90° CCW
-    }
- // If the rotated piece now collides, restore the old matrix
-    if (detect_collision(REFRESH)) {
-        for (int i = 0; i < 4; ++i) {
-            for (int j = 0; j < 4; ++j) {
-                block_matrix[i][j] = temp[i][j];
-            }
-        }
-    } else {
-        // Otherwise, redraw the piece at its current position
-        display_block(current_x, current_y, current_shape, current_color, ZERO);
-    }
-
-}
-
-//update PPU VRAM and OAM
-void update_screen() {
-        // Redraw the static, locked blocks
-    update_background();
-
-    // Draw the currently falling piece on top (no additional rotation)
-    display_block(current_x,
-                  current_y,
-                  current_shape,
-                  current_color,
-                  ZERO);
-
-}
-
-//check for line clears
-void check_clear() {
-     // Scan each row for completeness
-    for (int y = 0; y < ROWS; ++y) {
-        bool full = true;
-        // Check if every column in this row is occupied
-        for (int x = 0; x < COLS; ++x) {
-            if (playfield[x][y] == 0) {
-                full = false;
-                break;
-            }
-        }
-        // If the row is full, remove it and update HUD
-        if (full) {
-            clear_line(y);           // remove the line and shift above rows down
-            update_score();          // refresh the score display
-            update_lines_cleared();  // refresh the lines‐cleared display
-            // speed up every so often
-            if (increase_speed() == 0) {
-                update_speed();      // refresh the speed display
-                update_level();      // refresh the level display
-            }
-        }
-    }
-
-}
-
-//perform line clear
-void clear_line(int num) {
-     // Shift all rows above 'num' down by one
-    for (int y = num; y > 0; --y) {
-        for (int x = 0; x < COLS; ++x) {
-            playfield[x][y] = playfield[x][y - 1];
-        }
-    }
-    // Clear the top row
-    for (int x = 0; x < COLS; ++x) {
-        playfield[x][0] = 0;
-    }
-
-}
-
-//get random color
-int get_random_color() {
-    switch (rand() % 5) {
-        case 0: return BLUE;
-        case 1: return RED;
-        case 2: return GREEN;
-        case 3: return YELLOW;
-        case 4: return PURPLE;
-        default: 
-            return BLUE;  // should never happen, but satisfies all paths
-    }
-
-}
-
-//get random shape
-int get_random_shape() {
-switch(rand() % 7) {
-  case 0: return SHAPE_I;
-  case 1: return SHAPE_J;
-  case 2: return SHAPE_L;
-  case 3: return SHAPE_O;
-  case 4: return SHAPE_S;
-  case 5: return SHAPE_Z;
-  case 6: return SHAPE_T;
-}
-
-}
-
-//update the score graphic
-void update_score() {
-
-} 
-
-//update the speed graphic
-void update_speed() {
-
-} 
-
-//update the level graphic
-void update_level() {
-
-}
-
-//update lines cleared
-void update_lines_cleared() {
-
-}
-
-//display start screen
-void start_screen() {
-
-}
-
-//increase falling speed
-int  increase_speed() {
-
-}
-
-//display game over screen
-int  display_game_over() {
-
+void Tetris::for_each_next(std::function<void(int,int,uint8_t)> cb) const
+{
+    for(int y=0;y<4;++y)
+        for(int x=0;x<4;++x)
+            if(nxt.mask[y][x]) cb(x,y,nxt.mask[y][x]);
 }

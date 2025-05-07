@@ -49,7 +49,7 @@ static void load_assets()
 
 /* helpers for drawing --------------------------------------*/
 static inline void put_tile(int col,int row,uint8_t t)
-{ tilemap[row*80+col]=t; }
+{ tilemap[row*128 + col] = t; }   // ← 128‑byte stride
 
 static void draw_border()
 {

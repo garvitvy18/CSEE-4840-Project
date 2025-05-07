@@ -40,10 +40,10 @@ static constexpr uint8_t TILE2PAL(uint8_t t)
 static uint8_t TILESET[16384];
 inline void build_tileset()
 {
-    for (int t=0; t<256; ++t) {
-        uint8_t col = TILE2PAL(t);
-        for (int px=0; px<64; ++px)
-            TILESET[t*64+px] = (col<<4)|col;   /* two pixels / byte */
+    for (int t = 0; t < 256; ++t) {
+        uint8_t col = TILE2PAL(t);          // 0‑15 palette index
+        for (int px = 0; px < 64; ++px)
+            TILESET[t * 64 + px] = col;     // ONE pixel per byte  ← fix
     }
 }
 

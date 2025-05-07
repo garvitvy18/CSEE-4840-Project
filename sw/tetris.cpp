@@ -65,7 +65,7 @@ bool Tetris::collision(int nx, int ny, const Tetromino& pc, int r) const {
         for(int x = 0; x < 4; ++x)
             if (p.mask[y][x]) {
                 int gx = nx + x, gy = ny + y;
-                if (gx < 0 || gx >= COLS || gy > = ROWS) return true;
+                if (gx < 0 || gx >= COLS || gy >= ROWS) return true;
                 if (gy >= 0 && field[gy][gx]) return true;
             }
     return false;

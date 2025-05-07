@@ -166,7 +166,10 @@ static void poll_input(Tetris& t, int fd) {
         if (ev.type == EV_KEY && ev.value == 1) {
             switch(state) {
             case START:
-                if (ev.code == KEY_SPACE){ state = PLAY; }
+                if (ev.code == KEY_SPACE) { 
+                    state = PLAY; 
+                    clear_area(0, 0, 80, 60);
+                }
                 break;
             case PLAY:
                 switch(ev.code) {
@@ -196,7 +199,7 @@ static void show_start() {
 static void show_game_over() {
     clear_area(0, 0, 80, 60);
     draw_string(10, 20, "GAME OVER");
-    draw_string(10, 40, "SPACE: RESTART");
+    draw_string(0, 40, "SPACE: RESTART");
 }
 
 //Main program loop

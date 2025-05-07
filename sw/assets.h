@@ -72,7 +72,4 @@ inline void build_tileset()
     }
 }
 
-//Blank tile map
-static uint8_t BLANK_TILEMAP[8192] = {0};
-
 #endif

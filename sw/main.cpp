@@ -183,6 +183,7 @@ static void poll_input(Tetris& t, int fd) {
             case OVER:
                 if(ev.code == KEY_SPACE) { 
                     t.reset();
+                    clear_area(0, 0, 80, 60);
                     state = START; 
                 }
                 break;

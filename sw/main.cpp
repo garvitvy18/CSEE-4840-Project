@@ -146,7 +146,7 @@ Game Logic State Machine
 enum State {START, PLAY, OVER};
 static State state = START;
 
-//Open USB Keyboard
+//Open USB Controller
 static int open_kbd() {
     struct input_id id;
     char path[64], name[256];
@@ -174,45 +174,61 @@ static int open_kbd() {
     return -1;
 }
 
+
 //Read Keyboard input
 static void poll_input(Tetris& t, int fd) {
     struct input_event ev;
+    // read all pending events
     while (read(fd, &ev, sizeof(ev)) == sizeof(ev)) {
-        // D‑pad via ABS_HAT0X (code=0) / ABS_HAT0Y (code=1)
-        if (ev.type == EV_ABS) {
-            if (ev.code == 0) {            // left/right
-                if (ev.value == 0)         t.move_left();
-                else if (ev.value == 255)  t.move_right();
-            }
-            else if (ev.code == 1) {       // down
-                if (ev.value == 255)       t.soft_drop();
-            }
-        }
-        // Buttons via EV_KEY
-        else if (ev.type == EV_KEY && ev.value == 1) {
-            switch (ev.code) {
-                case 288:  // X
-                case 292:  // L
-                case 293:  // R
-                    t.rotate();            break;
-                case 289:  // A
-                    t.soft_drop();         break;
-                case 290:  // B
-                    t.hard_drop();         break;
-                case 291:  // Y
-                    t.toggle_pause();      break;
-                case 297:  // Start
-                    if (state == START || state == OVER) {
-                        if (state == OVER) {
-                            t.reset();
-                            clear_area(0,0,80,60);
-                        }
-                        state = PLAY;
+        switch (state) {
+            case START:
+                // Start button → PLAY
+                if (ev.type == EV_KEY && ev.value == 1 && ev.code == 297) {
+                    state = PLAY;
+                    clear_area(0, 0, 80, 60);
+                }
+                break;
+
+            case PLAY:
+                // D‑pad (ABS_HAT0X = code 0, ABS_HAT0Y = code 1)
+                if (ev.type == EV_ABS) {
+                    if (ev.code == 0) {              // left/right
+                        if (ev.value == 0)          t.move_left();
+                        else if (ev.value == 255)   t.move_right();
                     }
-                    break;
-                default:
-                    break;
-            }
+                    else if (ev.code == 1) {         // down
+                        if (ev.value == 255)        t.soft_drop();
+                    }
+                }
+                // Buttons (EV_KEY + value==1)
+                else if (ev.type == EV_KEY && ev.value == 1) {
+                    switch (ev.code) {
+                        case 288:  // X
+                        case 292:  // L
+                        case 293:  // R
+                            t.rotate();
+                            break;
+                        case 289:  // A
+                            t.soft_drop();
+                            break;
+                        case 290:  // B
+                            t.hard_drop();
+                            break;
+                        case 291:  // Y
+                            t.toggle_pause();
+                            break;
+                    }
+                }
+                break;
+
+            case OVER:
+                // Start → reset + PLAY
+                if (ev.type == EV_KEY && ev.value == 1 && ev.code == 297) {
+                    t.reset();
+                    clear_area(0, 0, 80, 60);
+                    state = PLAY;
+                }
+                break;
         }
     }
 }

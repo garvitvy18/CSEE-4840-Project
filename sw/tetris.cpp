@@ -78,7 +78,7 @@ void Tetris::rotate()    { if (!paused && !over && !collision(px, py, cur, (rot 
 void Tetris::soft_drop() { if (!paused && !over) ++py; }
 void Tetris::hard_drop() {
     if(paused || over) return;
-    while(!collision(px, py+1, cur, rot)) ++py;
+    while(!collision(px, py + 1, cur, rot)) ++py;
     lock_piece();
 }
 void Tetris::toggle_pause(){ if (!over) paused = !paused; }

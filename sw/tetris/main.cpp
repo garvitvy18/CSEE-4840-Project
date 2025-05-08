@@ -7,7 +7,8 @@
 #include <unistd.h>
 #include <cstdio>
 #include <cstring>
-
+#include <fstream>
+#include <iomanip> 
 /*
 ######################################
 Memory Mapping Functions and Constants
@@ -42,7 +43,24 @@ static void load_assets() {
         PA[i*4+2] = (color >> 16) & 0xFF;
         PA[i*4+3] = 0;
     }
-    build_tileset();
+    {
+        std::ifstream tf("tiles.hex");
+        if (tf) {
+            tf >> std::hex;  // parse from hex format
+            for (size_t i = 0; i < sizeof(TILESET); ++i) {
+                unsigned int v;
+                if (!(tf >> v)) {
+                    // malformed or too short: fall back to building
+                    build_tileset();
+                    break;
+                }
+                TILESET[i] = static_cast<uint8_t>(v);
+            }
+        } else {
+            // couldn’t open file: build at runtime
+            build_tileset();
+        }
+    }
     memcpy((void*) TS, TILESET, 16384);
     memset((void*) TM, 0, 8192);
 }

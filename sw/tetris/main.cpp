@@ -232,7 +232,7 @@ static void poll_input(Tetris& t, int fd) {
                         case 290:  // B
                             t.hard_drop();
                             break;
-                        case 291:  // Y
+                        case 296:  // Select
                             t.toggle_pause();
                             break;
                     }

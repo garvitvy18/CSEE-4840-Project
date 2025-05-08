@@ -237,7 +237,7 @@ static void poll_input(Tetris& t, int fd) {
 static void show_start() {
     memset((void*)TM, 0, 8192);
     draw_string(10, 20, "TETRIS FPGA");
-    draw_string(10, 40, "PRESS SPACE");
+    draw_string(10, 40, "PRESS START");
     draw_string(10, 50, "TO START");
 }
 
@@ -245,7 +245,7 @@ static void show_start() {
 static void show_game_over() {
     clear_area(0, 0, 80, 60);
     draw_string(10, 20, "GAME OVER");
-    draw_string(10, 40, "SPACE:");
+    draw_string(10, 40, "START:");
     draw_string(20, 50, "RESTART");
 }
 

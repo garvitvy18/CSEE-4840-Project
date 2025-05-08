@@ -12,27 +12,25 @@ PROGS := debug_controller list_input_devices controller_test
 all: $(PROGS)
 
 # Rule to build each executable
-$(PROGS): %: %.cpp
-<tab>$(CXX) $(CXXFLAGS) -o $@ $<
+%: %.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $<
 
 # Run any one of them:
 #   make run PROG=debug_controller
-#   make run PROG=list_input_devices
-#   make run PROG=controller_test
 run:
-<tab>if [ -z "$(PROG)" ]; then \
-<tab><tab>echo "Usage: make run PROG=<program>"; exit 1; \
-<tab>fi
-<tab>./$(PROG)
+	if [ -z "$(PROG)" ]; then \
+		echo "Usage: make run PROG=<program>"; exit 1; \
+	fi; \
+	./$(PROG)
 
 # Clean up all executables
 clean:
-<tab>rm -f $(PROGS)
+	rm -f $(PROGS)
 
 # Handy list of targets
 help:
-<tab>@echo "Usage:"
-<tab>@echo "  make             Build all programs"
-<tab>@echo "  make <name>      Build one (debug_controller, list_input_devices, controller_test)"
-<tab>@echo "  make run PROG=<name>  Compile if needed, then run that program"
-<tab>@echo "  make clean       Remove all executables"
+	@echo "Usage:"; \
+	echo "  make             Build all programs"; \
+	echo "  make <name>      Build one (debug_controller, list_input_devices, controller_test)"; \
+	echo "  make run PROG=<name>  Compile if needed, then run that program"; \
+	echo "  make clean       Remove all executables"

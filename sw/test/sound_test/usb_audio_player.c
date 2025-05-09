@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>               // for ceil()
 #include <unistd.h>
 #include <libusb-1.0/libusb.h>
 #include <mpg123.h>
@@ -45,7 +46,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // --- find the Audio‑Streaming interface & endpoint ---
+    // --- find Audio‑Streaming interface & endpoint ---
     struct libusb_config_descriptor *cfg = NULL;
     if (libusb_get_active_config_descriptor(
            libusb_get_device(dev), &cfg) != 0)
@@ -130,7 +131,9 @@ int main(int argc, char *argv[])
     mpg123_format(mh, 44100, MPG123_STEREO, MPG123_ENC_SIGNED_16);
 
     off_t frames = mpg123_length(mh);
-    double duration_s = (double)frames / 44100.0;
+    double duration_s = 0.0;
+    if (frames > 0)
+        duration_s = (double)frames / 44100.0;
     printf("Tetris.mp3 duration ≈ %.2f s\n", duration_s);
 
     // --- decode & submit loop ---

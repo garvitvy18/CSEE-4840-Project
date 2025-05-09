@@ -16,7 +16,7 @@ constexpr int PF_LEFT  = (TILE_COLS - PF_WIDTH ) / 2;
 constexpr int PF_TOP   = (TILE_ROWS - PF_HEIGHT) / 4;
 
 //Coordinates for score / lines
-constexpr int HUD_COL = 0;
+constexpr int HUD_COL = 10;
 constexpr int HUD_SCORE_ROW = 40;
 constexpr int HUD_LINES_ROW = HUD_SCORE_ROW + 10;
 

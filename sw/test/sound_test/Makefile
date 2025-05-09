@@ -3,12 +3,14 @@
 CC       := gcc
 PKGCFG   := pkg-config
 
-CFLAGS   := -Wall -O2 $$( $(PKGCFG) --cflags libusb-1.0 mpg123 )
-LDFLAGS  := $$( $(PKGCFG) --libs libusb-1.0 mpg123 ) -pthread
+CFLAGS   := -Wall -O2 $(shell $(PKGCFG) --cflags libusb-1.0 libmpg123)
+LDFLAGS  := $(shell $(PKGCFG) --libs libusb-1.0 libmpg123) -pthread
 
 SRC      := usb_audio_player.c
 OBJ      := $(SRC:.c=.o)
 TARGET   := usb_audio_player
+
+.PHONY: all clean
 
 all: $(TARGET)
 
@@ -20,5 +22,3 @@ $(TARGET): $(OBJ)
 
 clean:
 	rm -f $(TARGET) $(OBJ)
-
-.PHONY: all clean

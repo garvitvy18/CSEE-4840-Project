@@ -104,6 +104,36 @@ void Tetris::lock_piece() {
 
 //Clear lines
 void Tetris::clear_lines() {
+    int cleared = 0;
+    for(int y = 0; y < ROWS; ++y) {
+        bool full = true;
+        for(int x = 0; x < COLS; ++x) {
+            if (!field[y][x]) { full = false; break; }
+        }
+        if (full) {
+            for(int k = y; k > 0; --k) {
+                field[k] = field[k - 1];
+            }
+            field[0].fill(0);
+            ++cleared;
+        }
+    }
+
+    if (cleared > 0) {
+        lines_cleared += cleared;
+        // Tetris scoring: 1→100, 2→300, 3→500, 4→800
+        static const int SCORE_TABLE[5] = { 0, 100, 300, 500, 800 };
+        // Failsafe if somehow clears more than 5
+        if (cleared < 5) {
+            score_val += SCORE_TABLE[cleared];
+        } else {
+            score_val += (cleared / 4) * SCORE_TABLE[4]
+                       + SCORE_TABLE[cleared % 4];
+        }
+    }
+}
+/*
+void Tetris::clear_lines() {
     for(int y = 0; y < ROWS; ++y){
         bool full = true;
         for(int x = 0; x < COLS; ++x) if (!field[y][x]) {full = false; break;}
@@ -115,6 +145,7 @@ void Tetris::clear_lines() {
         }
     }
 }
+*/
 
 void Tetris::reset() {
     lines_cleared = 0;

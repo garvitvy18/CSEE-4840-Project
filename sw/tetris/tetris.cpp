@@ -132,20 +132,6 @@ void Tetris::clear_lines() {
         }
     }
 }
-/*
-void Tetris::clear_lines() {
-    for(int y = 0; y < ROWS; ++y){
-        bool full = true;
-        for(int x = 0; x < COLS; ++x) if (!field[y][x]) {full = false; break;}
-        if(full) {
-            for (int k = y; k > 0;--k) field[k] = field[k - 1];
-            field[0].fill(0);
-            ++lines_cleared; 
-            score_val += 100;
-        }
-    }
-}
-*/
 
 void Tetris::reset() {
     lines_cleared = 0;

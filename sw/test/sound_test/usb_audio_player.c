@@ -5,7 +5,6 @@
 #include <libusb-1.0/libusb.h>
 #include <mpg123.h>
 
-// callback invoked by libusb when an isochronous transfer completes
 static void LIBUSB_CALL transfer_cb(struct libusb_transfer *xfr)
 {
     free(xfr->buffer);
@@ -26,7 +25,7 @@ int main(int argc, char *argv[])
     uint16_t pid = (uint16_t)strtol(argv[2], NULL, 0);
     const char *mp3_path = argv[3];
 
-    // --- Initialize libusb ---
+    // --- libusb init ---
     libusb_context *ctx = NULL;
     if (libusb_init(&ctx) < 0) {
         perror("libusb_init");
@@ -41,33 +40,39 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // --- Locate the Audio‑Streaming interface + ISO‑OUT endpoint ---
+    // --- find Audio‑Streaming interface & ISO OUT endpoint ---
     struct libusb_config_descriptor *cfg = NULL;
-    libusb_get_active_config_descriptor(libusb_get_device(dev), &cfg);
+    if (libusb_get_active_config_descriptor(libusb_get_device(dev), &cfg) != 0) {
+        fprintf(stderr, "Error: cannot get config descriptor\n");
+        libusb_close(dev);
+        libusb_exit(ctx);
+        return 1;
+    }
 
-    int  audio_iface  = -1;
-    int  audio_altset = -1;
-    uint8_t ep_addr   = 0;
-    uint16_t ep_maxpkt= 0;
+    int  audio_iface   = -1;
+    int  audio_altset  = -1;
+    uint8_t ep_addr    = 0;
+    uint16_t ep_maxpkt = 0;
 
     for (int i = 0; i < cfg->bNumInterfaces && audio_iface < 0; i++) {
         const struct libusb_interface *intf = &cfg->interface[i];
         for (int a = 0; a < intf->num_altsetting; a++) {
             const struct libusb_interface_descriptor *alt = &intf->altsetting[a];
-            if (alt->bInterfaceClass    == LIBUSB_CLASS_AUDIO &&
-                alt->bInterfaceSubClass == 2 /* AUDIO_STREAMING */)
+            if (alt->bInterfaceClass   == LIBUSB_CLASS_AUDIO &&
+                alt->bInterfaceSubClass== 2 /* AUDIO_STREAMING */)
             {
                 for (int e = 0; e < alt->bNumEndpoints; e++) {
-                    const auto *ed = &alt->endpoint[e];
+                    const struct libusb_endpoint_descriptor *ed =
+                        &alt->endpoint[e];
                     if ((ed->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK)
                           == LIBUSB_TRANSFER_TYPE_ISOCHRONOUS &&
                         (ed->bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK)
                           == LIBUSB_ENDPOINT_OUT)
                     {
-                        audio_iface   = alt->bInterfaceNumber;
-                        audio_altset  = alt->bAlternateSetting;
-                        ep_addr       = ed->bEndpointAddress;
-                        ep_maxpkt     = ed->wMaxPacketSize;
+                        audio_iface  = alt->bInterfaceNumber;
+                        audio_altset = alt->bAlternateSetting;
+                        ep_addr      = ed->bEndpointAddress;
+                        ep_maxpkt    = ed->wMaxPacketSize;
                         break;
                     }
                 }
@@ -84,7 +89,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // detach kernel driver & claim the interface
     libusb_detach_kernel_driver(dev, audio_iface);
     if (libusb_claim_interface(dev, audio_iface) < 0) {
         fprintf(stderr, "Error: cannot claim interface %d\n", audio_iface);
@@ -94,19 +98,23 @@ int main(int argc, char *argv[])
     }
     libusb_set_interface_alt_setting(dev, audio_iface, audio_altset);
 
-    // --- Initialize mpg123 ---
+    // --- mpg123 init ---
     mpg123_init();
-    int err = 0;
-    mpg123_handle *mh = mpg123_new(NULL, &err);
+    int errcode = 0;
+    mpg123_handle *mh = mpg123_new(NULL, &errcode);
     if (!mh) {
         fprintf(stderr, "mpg123_new() failed: %s\n",
-                mpg123_plain_strerror(err));
+                mpg123_plain_strerror(errcode));
         goto cleanup_usb;
     }
-    mpg123_open(mh, mp3_path);
+    if (mpg123_open(mh, mp3_path) != MPG123_OK) {
+        fprintf(stderr, "mpg123_open() failed: %s\n",
+                mpg123_plain_strerror(errcode));
+        goto cleanup_mpg;
+    }
     mpg123_format(mh, 44100, MPG123_STEREO, MPG123_ENC_SIGNED_16);
 
-    // --- Decode & stream ---
+    // --- decode & submit loop ---
     size_t buf_size = ep_maxpkt * 32;
     unsigned char *decode_buf = malloc(buf_size);
     size_t bytes_decoded = 0;
@@ -138,19 +146,15 @@ int main(int argc, char *argv[])
             libusb_free_transfer(xfr);
             break;
         }
-        // pump events so the transfer actually goes out
         libusb_handle_events(ctx);
     }
+    libusb_handle_events_timeout_completed(ctx, &(struct timeval){1,0}, NULL);
+    free(decode_buf);
 
-    // drain remaining events
-    libusb_handle_events_timeout_completed(
-      ctx, &(struct timeval){1,0}, NULL);
-
-    // cleanup mpg123
+cleanup_mpg:
     mpg123_close(mh);
     mpg123_delete(mh);
     mpg123_exit();
-    free(decode_buf);
 
 cleanup_usb:
     libusb_release_interface(dev, audio_iface);

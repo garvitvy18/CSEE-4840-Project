@@ -41,13 +41,14 @@ public:
     int lines() const { return lines_cleared; }
     bool game_over() const { return over; }
 
+     int   score_val = 0;
+
 private:
     std::array<std::array<uint8_t,COLS>,ROWS> field{};
     Tetromino cur, nxt;
     int   px = 5, py = 0, rot = 0;
     int   tick = 0;
     bool  paused=false, over=false;
-    int   score_val = 0;
     int   lines_cleared = 0;
 
     void spawn();

@@ -268,10 +268,10 @@ static void show_game_over(Tetris& t) {
     draw_string(20, 50, "RESTART");
     sprintf(buf, "%d", t.score());
     draw_string(10, 20, "SCORE");
-    draw_string(40, 20, buf);
+    draw_string(50, 20, buf);
     sprintf(buf, "%d", t.lines());
     draw_string(10, 30, "LINES");
-    draw_string(40, 30, buf);
+    draw_string(50, 30, buf);
 }
 
 //Main program loop

@@ -15,7 +15,8 @@ enum Cell : uint8_t {
     BLUE  = 4,
     YELLOW= 5,
     CYAN  = 6,
-    MAG   = 7
+    MAG   = 7,
+    PINK  = 8
 };
 
 struct Tetromino { std::array<std::array<uint8_t,4>,4> mask{}; };

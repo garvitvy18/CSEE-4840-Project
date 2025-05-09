@@ -28,7 +28,7 @@ constexpr int NEXT_ROW = PF_TOP + 1;
 static constexpr uint32_t PALETTE24[16] = {
     0x000000, 0xFF0000, 0x00FF00, 0x0000FF,
     0xFFFF00, 0x00FFFF, 0xFF00FF, 0x808080,
-    0x404040, 0x606060, 0xA0A0A0, 0xC0C0C0,
+    0xFFAAAA, 0x606060, 0xA0A0A0, 0xC0C0C0,
     0xE0E0E0, 0xF0F0F0, 0xFFFFFF, 0xFFFFFF
 };
 
@@ -42,6 +42,7 @@ enum : uint8_t {
     TILE_YELLOW= 5,
     TILE_CYAN  = 6,
     TILE_MAG   = 7,
+    TILE_PINK  = 8,
     TILE_WHITE = 14
 };
 
@@ -56,6 +57,7 @@ static constexpr uint8_t TILE2PAL(uint8_t t)
         case TILE_YELLOW:return 4;
         case TILE_CYAN : return 5;
         case TILE_MAG  : return 6;
+        case TILE_PINK : return 8;
         case TILE_WHITE: return 14;
         default        : return 0;
     }

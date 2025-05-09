@@ -42,7 +42,7 @@ enum : uint8_t {
     TILE_YELLOW= 5,
     TILE_CYAN  = 6,
     TILE_MAG   = 7,
-    TILE_PINK  = 8,
+    TILE_PURPLE  = 8,
     TILE_WHITE = 14
 };
 
@@ -57,7 +57,7 @@ static constexpr uint8_t TILE2PAL(uint8_t t)
         case TILE_YELLOW:return 4;
         case TILE_CYAN : return 5;
         case TILE_MAG  : return 6;
-        case TILE_PINK : return 8;
+        case TILE_PURPLE : return 8;
         case TILE_WHITE: return 14;
         default        : return 0;
     }
